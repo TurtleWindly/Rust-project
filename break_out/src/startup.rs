@@ -51,16 +51,29 @@ fn startup_spawn(
     }).insert(Player);
 
     // Wall spawn section
+    let wall_thickness = 100.;
 
     // UpWall
     commands.spawn_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(128, 128, 128),
             // 100 is debug size
-            custom_size: Some(Vec2::new(window.width, 100.)),
+            custom_size: Some(Vec2::new(window.width, wall_thickness)),
             ..default()
         },
         transform: Transform::from_xyz(0., window.height / 2., 1.),
+        ..default()
+    }).insert(Wall);
+
+    //DownWall
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            color: Color::rgb_u8(128, 128, 128),
+            // 100 is debug size
+            custom_size: Some(Vec2::new(window.width, wall_thickness)),
+            ..default()
+        },
+        transform: Transform::from_xyz(0., window.height / 2. * -1., 1.),
         ..default()
     }).insert(Wall);
 
