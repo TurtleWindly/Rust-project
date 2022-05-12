@@ -57,7 +57,6 @@ fn startup_spawn(
     commands.spawn_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(128, 128, 128),
-            // 100 is debug size
             custom_size: Some(Vec2::new(window.width, wall_thickness)),
             ..default()
         },
@@ -69,13 +68,35 @@ fn startup_spawn(
     commands.spawn_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(128, 128, 128),
-            // 100 is debug size
             custom_size: Some(Vec2::new(window.width, wall_thickness)),
             ..default()
         },
         transform: Transform::from_xyz(0., window.height / 2. * -1., 1.),
         ..default()
     }).insert(Wall);
+
+    //LeftWall
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            color: Color::rgb_u8(128, 128, 128),
+            custom_size: Some(Vec2::new(wall_thickness, window.height)),
+            ..default()
+        },
+        transform: Transform::from_xyz(window.width / 2. * -1., 0., 1.),
+        ..default()
+    }).insert(Wall);
+
+    //RightWall
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            color: Color::rgb_u8(128, 128, 128),
+            custom_size: Some(Vec2::new(wall_thickness, window.height)),
+            ..default()
+        },
+        transform: Transform::from_xyz(window.width /2., 0., 1.),
+        ..default()
+    }).insert(Wall);
+
 
     // Brick spawn section
     let offset_x:f32 = -100.;
