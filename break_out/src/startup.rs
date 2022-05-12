@@ -4,24 +4,28 @@ use crate::component::*;
 pub struct StartupPlugin;
 
 struct BlockSpawnDetail {
-    gaps: i32,
+    gaps: f32,
     column: i32,
     row: i32,
+    width: f32,
+    height: f32,
 }
 
 impl Plugin for StartupPlugin {
     fn build(&self, app: &mut App) {
         app
             .insert_resource(WindowDescriptor {
-                title: "Break out!".to_string(),
+                title: "debug".to_string(),
                 width: 900.,
                 height: 700.,
                 ..default()
             })
             .insert_resource(BlockSpawnDetail {
-                gaps: 10,
+                gaps: 10.,
                 column: 5,
                 row: 3,
+                width: 100.,
+                height: 20.,
             })
             .add_startup_system(startup_spawn)
             .add_system(bevy::input::system::exit_on_esc_system);
@@ -30,37 +34,45 @@ impl Plugin for StartupPlugin {
 
 fn startup_spawn(
     mut commands: Commands,
-    block_spawn_detail: Res<BlockSpawnDetail>,
-    windows: Res<WindowDescriptor>,
+    brick_detail: Res<BlockSpawnDetail>,
+    // window: Res<WindowDescriptor>
 ) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+
+    // Spawn Player
     commands.spawn_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(255, 255, 255),
-            custom_size: Some(Vec2::new(50., 20.)),
+            custom_size: Some(Vec2::new(100., 20.)),
             ..default()
         },
         transform: Transform::from_xyz(0., -250., 0.),
         ..default()
     }).insert(Player);
 
-    println!("{}", windows.width);
+    // Brick spawn section
+    let offset_x:f32 = -100.;
+    let offset_y:f32 = 100.;
 
-    for _row in 0..block_spawn_detail.row {
-        for column in 0..block_spawn_detail.column {
-            commands.spawn().insert(Block {
-                sprite: SpriteBundle {
+    for row in 0..brick_detail.row {
+        for column in 0..brick_detail.column {
+            commands
+                .spawn_bundle(SpriteBundle {
                     sprite: Sprite {
                         color: Color::rgb_u8(0, 0, 0),
-                        custom_size: Some(Vec2::new((windows.width - (block_spawn_detail.gaps as f32 / 2.)) / block_spawn_detail.column as f32, 50.)),
+                        custom_size: Some(Vec2::new(brick_detail.width, brick_detail.height)),
                         ..default()
                     },
-                    transform: Transform::from_xyz(
-                                   block_spawn_detail.gaps as f32 + (column as f32 * windows.width - (block_spawn_detail.gaps as f32 / 2.))
-                                   , 0., 90.),
+                    transform: Transform {
+                        translation: Vec3::new(
+                                        offset_x + column as f32 * (brick_detail.width + brick_detail.gaps),
+                                        offset_y + row as f32 * (brick_detail.height + brick_detail.gaps),
+                                        0.),
+                        ..default()
+                    },
                     ..default()
-                }
-            });
+                })
+            .insert(Block);
         }
     }
 

@@ -4,6 +4,7 @@ use bevy::prelude::*;
 pub struct Player;
 
 #[derive(Component)]
-pub struct Block {
-    pub sprite: SpriteBundle,
-}
+pub struct Block;
+
+#[derive(Component)]
+pub struct Wall;
