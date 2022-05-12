@@ -35,7 +35,7 @@ impl Plugin for StartupPlugin {
 fn startup_spawn(
     mut commands: Commands,
     brick_detail: Res<BlockSpawnDetail>,
-    // window: Res<WindowDescriptor>
+    window: Res<WindowDescriptor>,
 ) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
@@ -49,6 +49,20 @@ fn startup_spawn(
         transform: Transform::from_xyz(0., -250., 0.),
         ..default()
     }).insert(Player);
+
+    // Wall spawn section
+
+    // UpWall
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            color: Color::rgb_u8(128, 128, 128),
+            // 100 is debug size
+            custom_size: Some(Vec2::new(window.width, 100.)),
+            ..default()
+        },
+        transform: Transform::from_xyz(0., window.height / 2., 1.),
+        ..default()
+    }).insert(Wall);
 
     // Brick spawn section
     let offset_x:f32 = -100.;
