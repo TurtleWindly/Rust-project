@@ -48,7 +48,25 @@ fn startup_spawn(
         },
         transform: Transform::from_xyz(0., -250., 0.),
         ..default()
-    }).insert(Player);
+    })
+        .insert(Player)
+        .insert(Collider);
+
+    // Ball
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            color: Color::rgb_u8(255, 0, 0),
+            custom_size: Some(Vec2::new(20., 20.)),
+            ..default()
+        },
+        transform: Transform::from_xyz(0., -230., 0.),
+        ..default()
+    })
+    .insert(Ball)
+    .insert(Velocity {
+        x: 200.,
+        y: 200.,
+    });
 
     // Wall spawn section
     let wall_thickness = 100.;
@@ -62,7 +80,9 @@ fn startup_spawn(
         },
         transform: Transform::from_xyz(0., window.height / 2., 1.),
         ..default()
-    }).insert(Wall);
+    })
+    .insert(Collider)
+    .insert(Wall::Horizontal);
 
     //DownWall
     commands.spawn_bundle(SpriteBundle {
@@ -73,7 +93,9 @@ fn startup_spawn(
         },
         transform: Transform::from_xyz(0., window.height / 2. * -1., 1.),
         ..default()
-    }).insert(Wall);
+    })
+    .insert(Collider)
+    .insert(Wall::Horizontal);
 
     //LeftWall
     commands.spawn_bundle(SpriteBundle {
@@ -84,7 +106,9 @@ fn startup_spawn(
         },
         transform: Transform::from_xyz(window.width / 2. * -1., 0., 1.),
         ..default()
-    }).insert(Wall);
+    })
+    .insert(Collider)
+    .insert(Wall::Vertical);
 
     //RightWall
     commands.spawn_bundle(SpriteBundle {
@@ -95,11 +119,12 @@ fn startup_spawn(
         },
         transform: Transform::from_xyz(window.width /2., 0., 1.),
         ..default()
-    }).insert(Wall);
-
+    })
+    .insert(Collider)
+    .insert(Wall::Vertical);
 
     // Brick spawn section
-    let offset_x:f32 = -100.;
+    let offset_x:f32 = -200.;
     let offset_y:f32 = 100.;
 
     for row in 0..brick_detail.row {
