@@ -53,13 +53,13 @@ fn startup_spawn(
         .insert(Collider);
 
     // Ball
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn().insert_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(255, 0, 0),
             custom_size: Some(Vec2::new(20., 20.)),
             ..default()
         },
-        transform: Transform::from_xyz(0., -230., 0.),
+        transform: Transform::from_xyz(-100., -230., 0.),
         ..default()
     })
     .insert(Ball)
@@ -72,7 +72,7 @@ fn startup_spawn(
     let wall_thickness = 100.;
 
     // UpWall
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn().insert_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(128, 128, 128),
             custom_size: Some(Vec2::new(window.width, wall_thickness)),
@@ -85,7 +85,7 @@ fn startup_spawn(
     .insert(Wall::Horizontal);
 
     //DownWall
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn().insert_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(128, 128, 128),
             custom_size: Some(Vec2::new(window.width, wall_thickness)),
@@ -98,7 +98,7 @@ fn startup_spawn(
     .insert(Wall::Horizontal);
 
     //LeftWall
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn().insert_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(128, 128, 128),
             custom_size: Some(Vec2::new(wall_thickness, window.height)),
@@ -111,7 +111,7 @@ fn startup_spawn(
     .insert(Wall::Vertical);
 
     //RightWall
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn().insert_bundle(SpriteBundle {
         sprite: Sprite {
             color: Color::rgb_u8(128, 128, 128),
             custom_size: Some(Vec2::new(wall_thickness, window.height)),
@@ -130,7 +130,8 @@ fn startup_spawn(
     for row in 0..brick_detail.row {
         for column in 0..brick_detail.column {
             commands
-                .spawn_bundle(SpriteBundle {
+                .spawn()
+                .insert_bundle(SpriteBundle {
                     sprite: Sprite {
                         color: Color::rgb_u8(0, 0, 0),
                         custom_size: Some(Vec2::new(brick_detail.width, brick_detail.height)),

@@ -47,7 +47,7 @@ fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>) {
 fn check_for_collision(
     mut commands: Commands,
     mut ball_query: Query<(&mut Velocity, &Transform), With<Ball>>,
-    collider_query: Query<(Entity, &Transform, Option<&Block>)>
+    collider_query: Query<(Entity, &Transform, Option<&Block>), With<Collider>>
 ) {
     let (mut ball_velocity, ball_transform) = ball_query.single_mut();
     let ball_size = ball_transform.scale.truncate();
@@ -59,6 +59,8 @@ fn check_for_collision(
             transform.translation,
             transform.scale.truncate(),
            );
+
+        println!("{:?}", collision);
 
         if let Some(collision) = collision {
             // despawn Block
