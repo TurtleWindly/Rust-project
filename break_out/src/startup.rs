@@ -37,7 +37,15 @@ fn startup_spawn(
     brick_detail: Res<BlockSpawnDetail>,
     window: Res<WindowDescriptor>,
 ) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    let mut camera = OrthographicCameraBundle::new_2d();
+
+    camera.orthographic_projection.top = 1.;
+    camera.orthographic_projection.bottom = -1.;
+
+    camera.orthographic_projection.right = 1.;
+    camera.orthographic_projection.left = -1.;
+
+    commands.spawn_bundle(camera);
 
     // Spawn Player
     commands.spawn_bundle(SpriteBundle {
@@ -59,7 +67,7 @@ fn startup_spawn(
             custom_size: Some(Vec2::new(20., 20.)),
             ..default()
         },
-        transform: Transform::from_xyz(-100., -230., 0.),
+        transform: Transform::from_xyz(100., -230., 0.),
         ..default()
     })
     .insert(Ball)
