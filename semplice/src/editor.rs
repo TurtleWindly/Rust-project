@@ -72,7 +72,6 @@ impl Editor {
         for line in self.offset.y..last_line {
             Editor::cursor_position(&Position {x: 0, y: index_line});
             print!("{}\r", match document.rows.get(line) {
-                // line is the string
                 Some(line) => {
                     if line.len() > terminal_width {
                         &line[self.offset.x..(terminal_width + self.offset.x)]
@@ -84,11 +83,6 @@ impl Editor {
             });
             index_line += 1;
         }
-        //TODO make a string slice so that a very long line will draw correctly without make the
-        //text go down
-        //
-        //To do that using a string slice instead of string, and the offset x.
-        //[offset.x..(terminal.width + offset.x)]
     }
 
     fn dead(e: &std::io::Error) {
