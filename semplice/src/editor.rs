@@ -66,12 +66,20 @@ impl Editor {
 
     fn draw_content(&self, document: &Document) {
         let last_line = get_terminal_size().unwrap().height as usize + self.offset.y;
+        let terminal_width = get_terminal_size().unwrap().width as usize;
+
         let mut index_line: usize = 0;
         for line in self.offset.y..last_line {
             Editor::cursor_position(&Position {x: 0, y: index_line});
             print!("{}\r", match document.rows.get(line) {
                 // line is the string
-                Some(line) => line,
+                Some(line) => {
+                    if line.len() > terminal_width {
+                        &line[self.offset.x..(terminal_width + self.offset.x)]
+                    } else {
+                        line
+                    }
+                }
                 None => break,
             });
             index_line += 1;
