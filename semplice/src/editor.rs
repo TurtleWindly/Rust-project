@@ -145,9 +145,9 @@ impl Editor {
                 }
             }
             Key::Down => {
-                if position.y < max_height {
+                if position.y < max_height - 1 {
                     position.y = position.y.saturating_add(1);
-                } else if offset.y < document.rows.len() - max_height {
+                } else if offset.y < document.rows.len().saturating_sub(max_height) {
                     offset.y = offset.y.saturating_add(1);
                 }
             }
@@ -179,7 +179,7 @@ impl Editor {
                 }
             }
             Key::PageUp => position.y = 0,
-            Key::PageDown => position.y = max_height,
+            Key::PageDown => position.y = max_height - 1,
             _ => (),
         }
 
