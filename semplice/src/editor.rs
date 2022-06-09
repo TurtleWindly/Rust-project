@@ -195,6 +195,7 @@ impl Editor {
 
 fn draw_rows() {
     let args: Vec<String>  = env::args().collect();
+    // In debug state
     let max_width  = String::from("four").len();
     for rows in 0..get_terminal_size().expect("Can't get height of terminal").height {
         Editor::clear_current_line();
