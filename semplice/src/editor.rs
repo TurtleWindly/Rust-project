@@ -68,20 +68,22 @@ impl Editor {
         let last_line = get_terminal_size().unwrap().height as usize + self.offset.y;
         let terminal_width = get_terminal_size().unwrap().width as usize;
 
-        let mut index_line: usize = 0;
-        for line in self.offset.y..last_line {
+        for (index_line, line) in (self.offset.y..last_line).enumerate() {
             Editor::cursor_position(&Position {x: 0, y: index_line});
             print!("{}\r", match document.rows.get(line) {
                 Some(line) => {
                     if line.len() > terminal_width {
-                        &line[self.offset.x..(terminal_width + self.offset.x)]
+                        let last_char = if terminal_width + self.offset.x > line.len() { line.len() } else { terminal_width + self.offset.x};
+
+                        &line[self.offset.x..last_char]
+                    } else if line.len() < self.offset.x {
+                        ""
                     } else {
-                        line
+                        &line[self.offset.x..]
                     }
                 }
                 None => break,
             });
-            index_line += 1;
         }
     }
 
@@ -106,7 +108,7 @@ impl Editor {
             }
             Key::Left | Key::Right | Key::Up | Key::Down |
             Key::Home | Key::End | Key::PageUp | Key::PageDown => {
-                Editor::moving_cursor(&pressed_key, &mut self.cursor_position, &self.document, &mut self.offset);
+                Editor::moving_cursor(pressed_key, &mut self.cursor_position, &self.document, &mut self.offset);
             }
             _ => (),
         }
@@ -121,7 +123,7 @@ impl Editor {
         print!("{}", termion::cursor::Hide);
     }
 
-    fn moving_cursor(pressed_key: &Key, cursor_position: &mut Position, document: &Document, offset: &mut Position) {
+    fn moving_cursor(pressed_key: Key, cursor_position: &mut Position, document: &Document, offset: &mut Position) {
         let mut position = Position {
             x: cursor_position.x,
             y: cursor_position.y,
@@ -129,6 +131,11 @@ impl Editor {
 
         let max_height = get_terminal_size().expect("can't get terminal height").height as usize - 1;
         let max_width  = get_terminal_size().expect("can't get terminal width").width   as usize - 1;
+
+        let current_line: String = match document.rows.get(offset.y + cursor_position.y) {
+            Some(line) => line.clone(),
+            None => String::new(),
+        };
 
         match pressed_key {
             Key::Up => {
@@ -144,17 +151,33 @@ impl Editor {
                     offset.y = offset.y.saturating_add(1);
                 }
             }
-            Key::Left => position.x = position.x.saturating_sub(1),
+            Key::Left => {
+                position.x = position.x.saturating_sub(1);
+                if cursor_position.x == 0 && offset.x != 0 {
+                    offset.x -= 1;
+                }
+            }
             Key::Right => {
                 if position.x < max_width {
                     position.x = position.x.saturating_add(1);
                 }
+                if cursor_position.x == max_width &&
+                    current_line.len() > max_width &&
+                    (offset.x + max_width + 1) != current_line.len() {
+                    offset.x = offset.x.saturating_add(1);
+                }
             }
-            Key::Home => position.x = 0,
-            Key::End => position.x = match document.rows.get(cursor_position.y + offset.y) {
-                Some(line) => line.len().saturating_sub(1),
-                None => 0,
-            },
+            Key::Home => {
+                position.x = 0;
+                offset.x = 0;
+            }
+            Key::End => {
+                position.x = current_line.len() - 1 - offset.x;
+                if current_line.len() > max_width + 1 {
+                    position.x = max_width - 1;
+                    offset.x = current_line.len() - max_width;
+                }
+            }
             Key::PageUp => position.y = 0,
             Key::PageDown => position.y = max_height,
             _ => (),
@@ -172,13 +195,14 @@ impl Editor {
 
 fn draw_rows() {
     let args: Vec<String>  = env::args().collect();
+    let max_width  = String::from("four").len();
     for rows in 0..get_terminal_size().expect("Can't get height of terminal").height {
         Editor::clear_current_line();
         if args.get(1) == None && rows == 2 {
             draw_welcome_message();
             continue;
         }
-        println!("~\r");
+        println!("{}\r", max_width);
     }
 }
 

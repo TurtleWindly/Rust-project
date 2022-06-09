@@ -8,7 +8,7 @@ pub struct Document {
 pub fn set_startup_document() -> Document {
     let args: Vec<String> = env::args().collect();
 
-    if !(args.len() == 2) {
+    if args.len() != 2 {
         println!("Need only one argument that is the file name");
         process::exit(1);
     }
@@ -27,7 +27,7 @@ fn file_not_exists(file_name: &String) -> bool {
     !Path::new(file_name).exists()
 }
 
-fn seperate_lines(content: &String) -> Document {
+fn seperate_lines(content: &str) -> Document {
     let mut document = Document::default();
     let mut line = String::new();
     let vector_chars: Vec<char> = content.chars().collect();
