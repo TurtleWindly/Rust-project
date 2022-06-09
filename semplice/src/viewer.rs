@@ -38,6 +38,10 @@ fn seperate_lines(content: &str) -> Document {
             line = String::new();
             continue;
         }
+        if character == '\t' {
+            line.push_str("    ");
+            continue;
+        }
         line.push_str(&character.to_string());
     }
 
