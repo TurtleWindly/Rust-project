@@ -132,6 +132,11 @@ impl Editor {
         let max_height = get_terminal_size().expect("can't get terminal height").height as usize - 1;
         let max_width  = get_terminal_size().expect("can't get terminal width").width   as usize - 1;
 
+        let before_line: String = match document.rows.get((offset.y + cursor_position.y).saturating_sub(1)) {
+            Some(line) => line.clone(),
+            None => String::new(),
+        };
+
         let current_line: String = match document.rows.get(offset.y + cursor_position.y) {
             Some(line) => line.clone(),
             None => String::new(),
@@ -142,6 +147,9 @@ impl Editor {
                 position.y = position.y.saturating_sub(1);
                 if offset.y > 0 && cursor_position.y == 0 {
                     offset.y = offset.y.saturating_sub(1);
+                }
+                if before_line.len() + offset.x < position.x + offset.x {
+                    position.x = before_line.len() - 1;
                 }
             }
             Key::Down => {
