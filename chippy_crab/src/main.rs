@@ -17,6 +17,10 @@ fn main() {
             height: 768.,
             ..default()
         })
+        .insert_resource(RapierConfiguration {
+            gravity: Vec2::new(0., -200.),
+            ..default()
+        })
         .add_plugins(DefaultPlugins)
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugin(RapierDebugRenderPlugin::default())

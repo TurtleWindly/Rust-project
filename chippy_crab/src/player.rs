@@ -5,7 +5,7 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_crab);
+        app.add_startup_system(spawn_crab).add_system(jump);
     }
 }
 
@@ -27,5 +27,22 @@ fn spawn_crab(mut commands: Commands, assets: Res<AssetServer>, window_des: Res<
         })
         .insert(Player)
         .insert(RigidBody::Dynamic)
-        .insert(Collider::cuboid(16., 16.));
+        .insert(Collider::cuboid(16., 16.))
+        .insert(Velocity {
+            linvel: Vec2::ZERO,
+            ..default()
+        })
+        .insert(ColliderMassProperties::Density(2.0));
+}
+
+fn jump(
+    mut query: Query<&mut Velocity, With<Player>>,
+    keyboard: Res<Input<KeyCode>>,
+    ) {
+    if keyboard.just_pressed(KeyCode::Space) {
+        let mut velocity = query.single_mut();
+
+        velocity.linvel = Vec2::new(0., 175.);
+    }
+
 }
