@@ -10,7 +10,6 @@ impl Plugin for LandPlugin {
 }
 
 fn spawn_land(mut commands: Commands, window_des: Res<WindowDescriptor>) {
-
     let width = window_des.width;
     let height = 64.;
 

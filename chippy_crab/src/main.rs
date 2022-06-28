@@ -2,9 +2,11 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use land::LandPlugin;
+use pipe::PipePlugin;
 use player::PlayerPlugin;
 
 mod land;
+mod pipe;
 mod player;
 
 fn main() {
@@ -20,6 +22,7 @@ fn main() {
         .add_plugin(RapierDebugRenderPlugin::default())
         .add_plugin(PlayerPlugin)
         .add_plugin(LandPlugin)
+        .add_plugin(PipePlugin)
         .add_startup_system(spawn_camera)
         .run();
 }
