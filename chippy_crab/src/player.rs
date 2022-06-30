@@ -1,11 +1,14 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+use crate::GameState;
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_crab).add_system(jump);
+        app.add_system_set(SystemSet::on_enter(GameState::InGame).with_system(spawn_crab))
+            .add_system_set(SystemSet::on_update(GameState::InGame).with_system(jump).with_system(lose));
     }
 }
 
@@ -40,5 +43,14 @@ fn jump(mut query: Query<&mut Velocity, With<Player>>, keyboard: Res<Input<KeyCo
         let mut velocity = query.single_mut();
 
         velocity.linvel = Vec2::new(0., 175.);
+    }
+}
+
+fn lose(query: Query<(&Transform, Entity), With<Player>>, mut commands: Commands, mut game_state: ResMut<State<GameState>>) {
+    for (transform, entity) in query.iter() {
+        if transform.translation.x < 0. {
+            commands.entity(entity).despawn();
+            game_state.set(GameState::ScoreMenu).expect("Can't change game state when player lose");
+        }
     }
 }
