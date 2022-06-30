@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.7"
-bevy_rapier2d = { version = "*", features = [ "simd-stable", "debug-render" ] }
+bevy_rapier2d = "*"
 rand = "0.8"
 
 [target.wasm32-unknown-unknown]

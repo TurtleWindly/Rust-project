@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use rand::prelude::*;
 
-use crate::{GameState, scores::Scores};
+use crate::{scores::Scores, GameState};
 
 pub struct PipePlugin;
 
@@ -30,7 +30,11 @@ pub struct PipeBot;
 pub struct PipeTop;
 
 // Spawn first time position pipes
-fn spawn_pipes(mut commands: Commands, window_des: Res<WindowDescriptor>, assest: Res<AssetServer>) {
+fn spawn_pipes(
+    mut commands: Commands,
+    window_des: Res<WindowDescriptor>,
+    assest: Res<AssetServer>,
+) {
     // Pairs of pipes
     let pipes_will_spawn: usize = 10;
     let pipe_width: f32 = 80.;
@@ -111,7 +115,10 @@ fn pipes_move(mut query: Query<&mut Transform, With<Pipe>>) {
     }
 }
 
-fn check_pipe_go_off_sceen(mut query: Query<(&mut Transform, &Sprite), With<Pipe>>, mut scores: ResMut<Scores>) {
+fn check_pipe_go_off_sceen(
+    mut query: Query<(&mut Transform, &Sprite), With<Pipe>>,
+    mut scores: ResMut<Scores>,
+) {
     let mut farest: f32 = 0.;
     let mut current_pos: f32 = 0.;
     for (transform, sprite) in query.iter() {
