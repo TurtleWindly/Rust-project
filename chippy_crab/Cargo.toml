@@ -7,3 +7,6 @@ edition = "2021"
 bevy = {version = "0.7", features = ["dynamic"]}
 bevy_rapier2d = { version = "*", features = [ "simd-stable", "debug-render" ] }
 rand = "0.8"
+
+[target.wasm32-unknown-unknown]
+runner = "wasm-server-runner"
