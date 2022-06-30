@@ -1,0 +1,9 @@
+[package]
+name = "chippy_crab"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = {version = "0.7", features = ["dynamic"]}
+bevy_rapier2d = { version = "*", features = [ "simd-stable", "debug-render" ] }
+rand = "0.8"

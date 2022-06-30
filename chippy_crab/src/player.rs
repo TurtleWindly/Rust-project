@@ -19,7 +19,7 @@ fn spawn_crab(mut commands: Commands, assets: Res<AssetServer>, window_des: Res<
         .spawn_bundle(SpriteBundle {
             texture: crab,
             transform: Transform {
-                scale: Vec3::new(3., 3., 0.),
+                scale: Vec3::new(2.5, 2.5, 0.),
                 translation: Vec3::new(100., window_des.height / 2., 0.),
                 ..default()
             },
@@ -27,7 +27,7 @@ fn spawn_crab(mut commands: Commands, assets: Res<AssetServer>, window_des: Res<
         })
         .insert(Player)
         .insert(RigidBody::Dynamic)
-        .insert(Collider::cuboid(16., 16.))
+        .insert(Collider::cuboid(16., 12.))
         .insert(Velocity {
             linvel: Vec2::ZERO,
             ..default()
@@ -35,14 +35,10 @@ fn spawn_crab(mut commands: Commands, assets: Res<AssetServer>, window_des: Res<
         .insert(ColliderMassProperties::Density(2.0));
 }
 
-fn jump(
-    mut query: Query<&mut Velocity, With<Player>>,
-    keyboard: Res<Input<KeyCode>>,
-    ) {
+fn jump(mut query: Query<&mut Velocity, With<Player>>, keyboard: Res<Input<KeyCode>>) {
     if keyboard.just_pressed(KeyCode::Space) {
         let mut velocity = query.single_mut();
 
         velocity.linvel = Vec2::new(0., 175.);
     }
-
 }
