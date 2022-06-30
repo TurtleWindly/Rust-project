@@ -80,18 +80,20 @@ fn spawn_play_button(mut commands: Commands, font: Res<UiFont>) {
         .insert(PlayButton)
         .insert(UiMainMenu)
         .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                text: Text::with_section(
-                    "Play",
-                    TextStyle {
-                        font: font.0.clone(),
-                        font_size: 40.0,
-                        color: Color::BLACK,
-                    },
-                    Default::default(),
-                ),
-                ..default()
-            }).insert(UiMainMenu);
+            parent
+                .spawn_bundle(TextBundle {
+                    text: Text::with_section(
+                        "Play",
+                        TextStyle {
+                            font: font.0.clone(),
+                            font_size: 40.0,
+                            color: Color::BLACK,
+                        },
+                        Default::default(),
+                    ),
+                    ..default()
+                })
+                .insert(UiMainMenu);
         });
 }
 

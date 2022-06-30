@@ -1,5 +1,5 @@
+use crate::{GameState, UiFont};
 use bevy::prelude::*;
-use crate::{UiFont, GameState};
 
 pub struct Scores(pub f32);
 
@@ -7,8 +7,7 @@ pub struct ScoresPlugin;
 
 impl Plugin for ScoresPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_system_set(SystemSet::on_enter(GameState::InGame).with_system(spawn_scores))
+        app.add_system_set(SystemSet::on_enter(GameState::InGame).with_system(spawn_scores))
             .add_system_set(SystemSet::on_update(GameState::InGame).with_system(update_scores))
             .add_system_set(SystemSet::on_enter(GameState::MainMenu).with_system(clean_ui));
     }

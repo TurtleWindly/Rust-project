@@ -9,8 +9,8 @@ use player::PlayerPlugin;
 use scores::{Scores, ScoresPlugin};
 
 mod land;
-mod mainmenu;
 mod losemenu;
+mod mainmenu;
 mod pipe;
 mod player;
 mod scores;
@@ -39,7 +39,6 @@ fn main() {
         .add_state(GameState::MainMenu)
         .add_plugins(DefaultPlugins)
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-        .add_plugin(RapierDebugRenderPlugin::default())
         .add_plugin(PlayerPlugin)
         .add_plugin(LandPlugin)
         .add_plugin(PipePlugin)

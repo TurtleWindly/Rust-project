@@ -1,13 +1,17 @@
+use crate::{GameState, UiFont};
 use bevy::prelude::*;
-use crate::{UiFont, GameState};
 
 pub struct LoseMenu;
 
 impl Plugin for LoseMenu {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(GameState::ScoreMenu).with_system(spawn_tilte).with_system(spawn_home_button))
-            .add_system_set(SystemSet::on_update(GameState::ScoreMenu).with_system(check_home_button))
-            .add_system_set(SystemSet::on_exit(GameState::ScoreMenu).with_system(clean_ui));
+        app.add_system_set(
+            SystemSet::on_enter(GameState::ScoreMenu)
+                .with_system(spawn_tilte)
+                .with_system(spawn_home_button),
+        )
+        .add_system_set(SystemSet::on_update(GameState::ScoreMenu).with_system(check_home_button))
+        .add_system_set(SystemSet::on_exit(GameState::ScoreMenu).with_system(clean_ui));
     }
 }
 
@@ -67,18 +71,20 @@ fn spawn_home_button(mut commands: Commands, font: Res<UiFont>) {
         .insert(HomeButton)
         .insert(UiLoseMenu)
         .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                text: Text::with_section(
-                    "Home",
-                    TextStyle {
-                        font: font.0.clone(),
-                        font_size: 40.0,
-                        color: Color::BLACK,
-                    },
-                    Default::default(),
-                ),
-                ..default()
-            }).insert(UiLoseMenu);
+            parent
+                .spawn_bundle(TextBundle {
+                    text: Text::with_section(
+                        "Home",
+                        TextStyle {
+                            font: font.0.clone(),
+                            font_size: 40.0,
+                            color: Color::BLACK,
+                        },
+                        Default::default(),
+                    ),
+                    ..default()
+                })
+                .insert(UiLoseMenu);
         });
 }
 
