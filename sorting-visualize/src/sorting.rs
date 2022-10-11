@@ -31,39 +31,45 @@ impl Plugin for SortingPlugin {
     }
 }
 
-fn calculate_bar_size(mut bar_info: ResMut<BarInfo>, array: Res<SortingArray>, windows_des: Res<WindowDescriptor>) {
+fn calculate_bar_size(
+    mut bar_info: ResMut<BarInfo>,
+    array: Res<SortingArray>,
+    windows_des: Res<WindowDescriptor>,
+) {
     bar_info.width = windows_des.width / array.value.len() as f32;
     bar_info.height_in_screen = windows_des.height / array.value.len() as f32;
 }
 
 fn sorting(array: Res<SortingArray>) {
-    for _a in &array.value {
-    }
+    for _a in &array.value {}
 }
 
 // Spawn the bar to correct location
 fn draw_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>, mut commands: Commands) {
-
     let mut index = 0f32;
     for element in &array.value {
         let width = bar_info.width;
+        // Get the height ratio then mutiply it to have height in screen
         let height = bar_info.height_in_screen * element.clone() as f32;
 
         let sprite = Sprite {
-            color: Color::rgb_u8(255, 255, 255),
+            color: Color::rgb_u8(255, 255, 255), //White
             custom_size: Some(Vec2::new(width, height)),
             ..default()
         };
 
-        commands.spawn_bundle(SpriteBundle {
-            sprite,
-            transform: Transform {
-                translation: Vec3::new( width * index + width / 2., height / 2., 0.),
-            ..default()},
-            ..default()
-        })
-        .insert(Bar);
-    
+        commands
+            .spawn_bundle(SpriteBundle {
+                sprite,
+                transform: Transform {
+                    // width and height have origin center should add off set to down left
+                    translation: Vec3::new(width * index + width / 2., height / 2., 0.),
+                    ..default()
+                },
+                ..default()
+            })
+            .insert(Bar);
+
         index = index + 1.;
     }
 }
