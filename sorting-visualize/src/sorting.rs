@@ -3,6 +3,11 @@ use bevy::prelude::*;
 #[derive(Default)]
 struct SortingArray {
     value: Vec<i32>,
+    loop_times: i32,
+    sorted_times: i32,
+    // Check if arr need swapping, if not is sorting will false meaning the arr is done
+    is_swapping: bool,
+    is_sorting: bool,
 }
 
 #[derive(Default)]
@@ -19,7 +24,11 @@ pub struct SortingPlugin;
 impl Plugin for SortingPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(SortingArray {
-            value: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            value: vec![9, 2, 4, 7, 0, 1, 6, 3, 5, 8],
+            loop_times: 0,
+            sorted_times: 0,
+            is_swapping: false,
+            is_sorting: true,
         })
         .insert_resource(BarInfo {
             width: 0.,
@@ -27,7 +36,7 @@ impl Plugin for SortingPlugin {
         })
         .add_startup_system(calculate_bar_size.label("calculate"))
         .add_startup_system(draw_bar.after("calculate"))
-        .add_system(sorting);
+        .add_system(sorting_arr);
     }
 }
 
@@ -38,10 +47,6 @@ fn calculate_bar_size(
 ) {
     bar_info.width = windows_des.width / array.value.len() as f32;
     bar_info.height_in_screen = windows_des.height / array.value.len() as f32;
-}
-
-fn sorting(array: Res<SortingArray>) {
-    for _a in &array.value {}
 }
 
 // Spawn the bar to correct location
@@ -72,4 +77,33 @@ fn draw_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>, mut commands: Comm
 
         index = index + 1.;
     }
+}
+
+//Buble Sort
+// Sorting alrorithm but NOT DRAWING!
+fn sorting_arr(mut array: ResMut<SortingArray>) {
+
+    let len = array.value.len() as i32;
+
+    if !array.is_sorting {
+        return;
+    }
+
+    if array.sorted_times < len - array.loop_times - 1 {
+        let index = array.sorted_times as usize;
+        if array.value[index] > array.value[index + 1] {
+            let temp = array.value[index];
+            array.value[index] = array.value[index + 1];
+            array.value[index + 1] = temp;
+
+            array.is_swapping = true;
+        }
+        array.sorted_times += 1;
+    } else {
+        if !array.is_swapping { array.is_sorting = false}
+        array.is_swapping = false;
+        array.sorted_times = 0;
+        array.loop_times += 1;
+    }
+
 }
