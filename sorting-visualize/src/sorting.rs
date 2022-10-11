@@ -17,7 +17,7 @@ struct BarInfo {
 }
 
 #[derive(Component)]
-struct Bar;
+struct Bar(i32);
 
 pub struct SortingPlugin;
 
@@ -36,7 +36,8 @@ impl Plugin for SortingPlugin {
         })
         .add_startup_system(calculate_bar_size.label("calculate"))
         .add_startup_system(draw_bar.after("calculate"))
-        .add_system(sorting_arr);
+        .add_system(update_bar.label("update"))
+        .add_system(sorting_arr.after("update"));
     }
 }
 
@@ -73,9 +74,23 @@ fn draw_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>, mut commands: Comm
                 },
                 ..default()
             })
-            .insert(Bar);
+            .insert(Bar(array.value[index as usize]));
 
-        index = index + 1.;
+        index += 1.;
+    }
+}
+
+fn update_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>,mut query: Query<(&mut Transform, &Bar), With<Bar>>) {
+    let width = bar_info.width;
+    for (mut transform, bar) in query.iter_mut() {
+        let mut index= 0;
+        for element_index in 0..array.value.len() {
+            if bar.0 == array.value[element_index] {
+                index= element_index;
+            }
+        }
+
+        transform.translation.x = width * index as f32 + width / 2.;
     }
 }
 
