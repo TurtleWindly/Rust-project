@@ -37,10 +37,11 @@ fn calculate_bar_size(mut bar_info: ResMut<BarInfo>, array: Res<SortingArray>, w
 }
 
 fn sorting(array: Res<SortingArray>) {
-    for a in &array.value {
+    for _a in &array.value {
     }
 }
 
+// Spawn the bar to correct location
 fn draw_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>, mut commands: Commands) {
 
     let mut index = 0f32;
@@ -57,7 +58,7 @@ fn draw_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>, mut commands: Comm
         commands.spawn_bundle(SpriteBundle {
             sprite,
             transform: Transform {
-                translation: Vec3::new(element.clone() as f32 * index, 0., 0.),
+                translation: Vec3::new( width * index + width / 2., height / 2., 0.),
             ..default()},
             ..default()
         })
