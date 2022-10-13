@@ -1,9 +1,12 @@
 use bevy::prelude::*;
 use debug::DebugPlugin;
 use sorting::SortingPlugin;
+use sorting_algorithms::SortingAlgorithms;
 
 mod debug;
 mod sorting;
+mod sorting_algorithms;
+mod array;
 
 fn main() {
     App::new()
@@ -17,6 +20,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(DebugPlugin)
         .add_plugin(SortingPlugin)
+        .add_plugin(SortingAlgorithms)
         .run();
 }
 

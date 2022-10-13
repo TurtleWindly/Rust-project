@@ -1,13 +1,15 @@
 use bevy::prelude::*;
 
+use crate::array;
+
 #[derive(Default)]
-struct SortingArray {
-    value: Vec<i32>,
-    loop_times: i32,
-    sorted_times: i32,
+pub struct SortingArray {
+    pub value: Vec<i32>,
+    pub loop_times: i32,
+    pub sorted_times: i32,
     // Check if arr need swapping, if not is sorting will false meaning the arr is done
-    is_swapping: bool,
-    is_sorting: bool,
+    pub is_swapping: bool,
+    pub is_sorting: bool,
 }
 
 #[derive(Default)]
@@ -24,7 +26,8 @@ pub struct SortingPlugin;
 impl Plugin for SortingPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(SortingArray {
-            value: vec![9, 2, 4, 7, 0, 1, 6, 3, 5, 8],
+            // Create an array then shuffle it
+            value: array::shuffle_vec( array::create_vec(0, 100)),
             loop_times: 0,
             sorted_times: 0,
             is_swapping: false,
@@ -36,8 +39,7 @@ impl Plugin for SortingPlugin {
         })
         .add_startup_system(calculate_bar_size.label("calculate"))
         .add_startup_system(draw_bar.after("calculate"))
-        .add_system(update_bar.label("update"))
-        .add_system(sorting_arr.after("update"));
+        .add_system(update_bar.label("update"));
     }
 }
 
@@ -80,9 +82,13 @@ fn draw_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>, mut commands: Comm
     }
 }
 
+// Update the bar state after being sorted
 fn update_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>,mut query: Query<(&mut Transform, &Bar), With<Bar>>) {
     let width = bar_info.width;
+    // Get x, y and bar height
     for (mut transform, bar) in query.iter_mut() {
+        // Check if current index array value is equal to bar height
+        // If correct then draw it in correct index
         let mut index= 0;
         for element_index in 0..array.value.len() {
             if bar.0 == array.value[element_index] {
@@ -90,35 +96,7 @@ fn update_bar(array: Res<SortingArray>, bar_info: Res<BarInfo>,mut query: Query<
             }
         }
 
+        // The correct index value and bar height
         transform.translation.x = width * index as f32 + width / 2.;
     }
-}
-
-//Buble Sort
-// Sorting alrorithm but NOT DRAWING!
-fn sorting_arr(mut array: ResMut<SortingArray>) {
-
-    let len = array.value.len() as i32;
-
-    if !array.is_sorting {
-        return;
-    }
-
-    if array.sorted_times < len - array.loop_times - 1 {
-        let index = array.sorted_times as usize;
-        if array.value[index] > array.value[index + 1] {
-            let temp = array.value[index];
-            array.value[index] = array.value[index + 1];
-            array.value[index + 1] = temp;
-
-            array.is_swapping = true;
-        }
-        array.sorted_times += 1;
-    } else {
-        if !array.is_swapping { array.is_sorting = false}
-        array.is_swapping = false;
-        array.sorted_times = 0;
-        array.loop_times += 1;
-    }
-
 }
