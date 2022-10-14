@@ -42,7 +42,9 @@ fn spawn_machine(mut commands: Commands) {
                 ..default()
             },
             ..default()
-        });
+        })
+        .insert(PC)
+        .insert(Machine{ id: format!("PC{}", index)});
     }
 
     // Spawn Switch
@@ -54,7 +56,9 @@ fn spawn_machine(mut commands: Commands) {
             ..default()
         },
         ..default()
-    });
+    })
+    .insert(Switch)
+    .insert(Machine{ id: "Switch1".into()});
     // 2
     commands.spawn_bundle(SpriteBundle {
         sprite: sw_sprite.clone(),
@@ -63,7 +67,9 @@ fn spawn_machine(mut commands: Commands) {
             ..default()
         },
         ..default()
-    });
+    })
+    .insert(Switch)
+    .insert(Machine{ id: "Switch2".into()});
     // 3
     commands.spawn_bundle(SpriteBundle {
         sprite: sw_sprite.clone(),
@@ -72,5 +78,7 @@ fn spawn_machine(mut commands: Commands) {
             ..default()
         },
         ..default()
-    });
+    })
+    .insert(Switch)
+    .insert(Machine{ id: "Switch3".into()});
 }
