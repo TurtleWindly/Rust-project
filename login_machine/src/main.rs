@@ -1,47 +1,37 @@
-use std::io;
-use std::fs;
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
-use std::io::Write;
+use std::{collections::HashMap, fs::File};
 
-#[derive(Hash)]
-struct User {
-    name: String,
-    pass: String,
+use ron::de::from_reader;
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+struct Config {
+    boolean: bool,
+    float: f32,
+    map: HashMap<u8, char>,
+    nested: Nested,
+    tuple: (u32, u32),
+    vec: Vec<Nested>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Nested {
+    a: String,
+    b: char,
 }
 
 fn main() {
-    // get login name input
-    let login_name = name_login();
-    // check if the name exsit
-    // if not then quit
-    println!("{}", ron_to_string());
+    let input_path = String::from("src/user.ron");
+    let f = File::open(&input_path).expect("Failed opening file");
+    let config: Config = match from_reader(f) {
+        Ok(x) => x,
+        Err(e) => {
+            println!("Failed to load config: {}", e);
 
-    //TODO get login pass input
-    // check if the pass exsit
-    // if not then quit
-    // if yes then print corract then end
+            std::process::exit(1);
+        }
+    };
+
+    println!("Config: {:?}", &config);
 }
 
-fn ron_to_string() -> String {
-    let ron = fs::read_to_string("user.ron")
-        .expect("Can't read user.ron");
-    ron
-}
-
-fn calculate_hash<T: Hash>(t: &T) -> u64 {
-    let mut s = DefaultHasher::new();
-    t.hash(&mut s);
-    s.finish()
-}
-
-fn name_login() -> String {
-    let mut name = String::new();
-    println!("---------------------------------------------------------");
-    print!("login: ");
-    io::stdout().flush().unwrap();
-    io::stdin()
-        .read_line(&mut name)
-        .expect("Can't read input");
-    name
-}
+// TLDG: Need a struct to hold all of ron data

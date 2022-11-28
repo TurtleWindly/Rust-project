@@ -1,10 +1,35 @@
-UserList [
-    (
-        name: "minh",
-        pass: 8942473033995874750,
+// List (
+//     UserList: [
+//         (
+//             name: "minh",
+//             pass: 8942473033995874750,
+//         ),
+//         (
+//             name: "lux",
+//             pass: 4050011181299684810,
+//         ),
+//     ],
+// )
+
+(
+    boolean: true,
+    float: 8.2,
+    map: {
+        1: '1',
+        2: '4',
+        3: '9',
+        4: '1',
+        5: '2',
+        6: '3',
+    },
+    nested: Nested(
+        a: "Decode me!",
+        b: 'z',
     ),
-    (
-        name: "lux",
-        pass: 4050011181299684810,
-    )
-]
+    tuple: (3, 7),
+    vec: [
+        (a: "Nested 1", b: 'x'),
+        (a: "Nested 2", b: 'y'),
+        (a: "Nested 3", b: 'z'),
+    ],
+)
