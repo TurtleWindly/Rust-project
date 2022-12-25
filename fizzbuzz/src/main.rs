@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 fn main() {
     let mut index = 1;
-    loop {
+    fun_name();    loop {
         match index.cmp(&100) {
             Ordering::Less | Ordering::Equal => {
                 match index % 3 == 0 && index % 5 == 0{
@@ -20,4 +20,7 @@ fn main() {
             Ordering::Greater => break,
         }
     }
+}
+
+fn fun_name() {
 }
