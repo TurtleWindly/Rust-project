@@ -22,18 +22,11 @@ fn main() {
 
         // store key press state Press/Release
         chip8.set_keys();
-        
     }
 }
 
-fn setup_graphic() {
-    
-}
+fn setup_graphic() {}
 
-fn setup_input() {
-    
-}
+fn setup_input() {}
 
-fn draw_graphic() {
-    
-}
+fn draw_graphic() {}

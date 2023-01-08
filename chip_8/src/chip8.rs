@@ -1,4 +1,3 @@
-
 pub struct Chip8 {
     pub opcode: i16,
     pub memory: [u8; 4096],
@@ -24,15 +23,22 @@ pub struct Chip8 {
 
 impl Chip8 {
     pub fn new() -> Chip8 {
-        Chip8 { opcode: 0, memory: [0; 4096], v: [0; 16], i: 0, pc: 0, display: [0; 64 * 32], delay_timer: 0, sound_timer: 0, stack: [0; 16], sp: 0, keypad: [0; 16], draw_flag: false}
+        Chip8 {
+            opcode: 0,
+            memory: [0; 4096],
+            v: [0; 16],
+            i: 0,
+            pc: 0,
+            display: [0; 64 * 32],
+            delay_timer: 0,
+            sound_timer: 0,
+            stack: [0; 16],
+            sp: 0,
+            keypad: [0; 16],
+            draw_flag: false,
+        }
     }
-    pub fn load_game(&self, name: String) {
-        
-    }
-    pub fn emulate_cycle(&self) {
-        
-    }
-    pub fn set_keys(&self) {
-        
-    }
+    pub fn load_game(&self, name: String) {}
+    pub fn emulate_cycle(&self) {}
+    pub fn set_keys(&self) {}
 }
