@@ -1,3 +1,5 @@
+use std::{thread, time};
+
 mod chip8;
 
 use chip8::Chip8;
@@ -10,6 +12,8 @@ fn main() {
     let chip8 = Chip8::new();
     chip8.load_game("pong".to_string());
 
+    // 60 FPS
+    let delay = time::Duration::from_secs_f32(1. / 60.);
     // Emulation loop
     loop {
         // emulate 1 cycle
@@ -22,6 +26,9 @@ fn main() {
 
         // store key press state Press/Release
         chip8.set_keys();
+
+        // Slow down to execute only 60 times per second
+        thread::sleep(delay);
     }
 }
 
