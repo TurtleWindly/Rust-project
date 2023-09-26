@@ -1,19 +1,18 @@
-fn toogle_doors(step: usize, mut doors: [bool; 100]) -> [bool; 100] {
-    for index in (0..=doors.len()).step_by(step) {
-        doors[index] = !doors[index];
-        println!("{}", doors[index]);
-    }
-    return doors;
-}
-
 fn main() {
-    let mut doors: [bool; 100] = [false; 100];
-    for index in 1..=doors.len() {
-        doors = toogle_doors(index, doors);
+    let mut doors = [false; 100];
+    let mut _index: usize = 0;
+    for step in 0..doors.len() {
+        _index = step;
+        while _index < 100 {
+            doors[_index] = !doors[_index];
+            _index += step + 1;
+        }
     }
+
+    // Output
     for (index, door) in doors.iter().enumerate() {
         if *door {
-            println!("The {} door is open", index);
+            println!("The {} door is open", index + 1);
         }
     }
 }
