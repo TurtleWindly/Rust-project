@@ -21,7 +21,7 @@ fn spawn_land(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         ..default()
-    }, Name::new("Land")));
+    }, Name::new("Right Land")));
 
     commands.spawn((SpriteBundle {
         texture: land.clone(),
@@ -34,5 +34,5 @@ fn spawn_land(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         ..default()
-    }, Name::new("Land")));
+    }, Name::new("Left Land")));
 }
