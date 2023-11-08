@@ -8,7 +8,7 @@ impl Plugin for MainMenuPlugin {
         app
             .add_state::<GameState>()
             .add_systems(Startup, setup_main_menu)
-            .add_systems(Update, play_button_system)
+            .add_systems(Update, play_button_system.run_if(in_state(GameState::MainMenu)))
             .add_systems(OnExit(GameState::MainMenu), clean_ui);
     }
 }

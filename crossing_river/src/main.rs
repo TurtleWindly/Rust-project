@@ -4,10 +4,12 @@ use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 use boat::BoatPlugin;
+use land::LandPlugin;
 use main_menu::MainMenuPlugin;
 
 mod boat;
 mod main_menu;
+mod land;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Default, States)]
 pub enum GameState {
@@ -30,8 +32,9 @@ fn main() {
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         )
-        .add_plugins(BoatPlugin)
         .add_plugins(MainMenuPlugin)
+        .add_plugins(BoatPlugin)
+        .add_plugins(LandPlugin)
         .add_systems(Startup, camera_setup)
         .run();
 }
