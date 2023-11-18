@@ -28,7 +28,7 @@ struct ButtonMoveBoat;
 struct Boat;
 
 #[derive(Component)]
-enum Direction {
+pub enum Direction {
     Left,
     Right,
 }
@@ -67,7 +67,7 @@ fn spawn_button_move_boat(mut commands: Commands, asset_server: Res<AssetServer>
             .with_style(Style {
                     position_type: PositionType::Relative,
                     ..default()
-                })));
+            })));
         });
 }
 

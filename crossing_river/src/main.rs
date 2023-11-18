@@ -3,6 +3,7 @@ use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+use chicken::ChickenPlugin;
 use boat::BoatPlugin;
 use land::LandPlugin;
 use main_menu::MainMenuPlugin;
@@ -10,6 +11,7 @@ use main_menu::MainMenuPlugin;
 mod boat;
 mod main_menu;
 mod land;
+mod chicken;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Default, States)]
 pub enum GameState {
@@ -17,6 +19,15 @@ pub enum GameState {
     MainMenu,
     Game,
     ScoreMenu,
+}
+
+#[derive(Component)]
+pub struct Object;
+
+#[derive(Component)]
+pub enum ObjectLocation {
+    Land,
+    Boat,
 }
 
 fn main() {
@@ -35,6 +46,7 @@ fn main() {
         .add_plugins(MainMenuPlugin)
         .add_plugins(BoatPlugin)
         .add_plugins(LandPlugin)
+        .add_plugins(ChickenPlugin)
         .add_systems(Startup, camera_setup)
         .run();
 }
