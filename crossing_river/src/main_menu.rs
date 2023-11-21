@@ -1,14 +1,16 @@
-use bevy::prelude::*;
 use crate::GameState;
+use bevy::prelude::*;
 
 pub struct MainMenuPlugin;
 
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_state::<GameState>()
+        app.add_state::<GameState>()
             .add_systems(Startup, setup_main_menu)
-            .add_systems(Update, play_button_system.run_if(in_state(GameState::MainMenu)))
+            .add_systems(
+                Update,
+                play_button_system.run_if(in_state(GameState::MainMenu)),
+            )
             .add_systems(OnExit(GameState::MainMenu), clean_ui);
     }
 }
@@ -61,33 +63,47 @@ fn setup_main_menu(mut commands: Commands, assert_server: Res<AssetServer>) {
         })
         // Play Button
         .with_children(|parent| {
-            parent.spawn((Name::new("Play Button"), PlayButton, ButtonBundle {
-                style: Style {
-                    width: Val::Px(200.),
-                    height: Val::Px(100.),
-                    position_type: PositionType::Relative,
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    ..default()
-                },
-                background_color: Color::rgb_u8(255, 255, 255).into(),
-                ..default()
-            })).with_children(|parent| {
-                    parent.spawn(TextBundle::from_section("Play", TextStyle {
-                        font: assert_server.load("fonts/HackNerdFont.ttf"),
-                        font_size: 30.,
-                        color: Color::BLACK,
+            parent
+                .spawn((
+                    Name::new("Play Button"),
+                    PlayButton,
+                    ButtonBundle {
+                        style: Style {
+                            width: Val::Px(200.),
+                            height: Val::Px(100.),
+                            position_type: PositionType::Relative,
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..default()
+                        },
+                        background_color: Color::rgb_u8(255, 255, 255).into(),
+                        ..default()
                     },
-                    ).with_text_alignment(TextAlignment::Center)
-                    .with_style(Style {
+                ))
+                .with_children(|parent| {
+                    parent.spawn(
+                        TextBundle::from_section(
+                            "Play",
+                            TextStyle {
+                                font: assert_server.load("fonts/HackNerdFont.ttf"),
+                                font_size: 30.,
+                                color: Color::BLACK,
+                            },
+                        )
+                        .with_text_alignment(TextAlignment::Center)
+                        .with_style(Style {
                             position_type: PositionType::Relative,
                             ..default()
-                    }));
+                        }),
+                    );
                 });
         });
 }
 
-fn play_button_system(mut commands: Commands, interaction_query: Query<&Interaction, (Changed<Interaction>, With<PlayButton>)>) {    
+fn play_button_system(
+    mut commands: Commands,
+    interaction_query: Query<&Interaction, (Changed<Interaction>, With<PlayButton>)>,
+) {
     for interaction in &interaction_query {
         match *interaction {
             Interaction::Pressed => {

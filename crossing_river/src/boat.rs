@@ -1,5 +1,5 @@
-use bevy::prelude::*;
 use crate::GameState;
+use bevy::prelude::*;
 
 pub struct BoatPlugin;
 
@@ -12,12 +12,13 @@ pub enum BoatState {
 
 impl Plugin for BoatPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_state::<BoatState>()
-            .add_systems(OnEnter(GameState::Game), (spawn_boat, spawn_button_move_boat))
+        app.add_state::<BoatState>()
+            .add_systems(
+                OnEnter(GameState::Game),
+                (spawn_boat, spawn_button_move_boat),
+            )
             .add_systems(Update, check_button_boat.run_if(in_state(GameState::Game)))
-            .add_systems(Update, move_boat.run_if(in_state(BoatState::Moving)))
-        ;
+            .add_systems(Update, move_boat.run_if(in_state(BoatState::Moving)));
     }
 }
 
@@ -36,38 +37,59 @@ pub enum Direction {
 fn spawn_boat(mut commands: Commands, asset_server: Res<AssetServer>) {
     let texture = asset_server.load("boat.png");
 
-    commands.spawn((SpriteBundle {
-        texture,
-        transform: Transform {
-            translation: Vec3 { x: 140., y: -260., z: 1.},
+    commands.spawn((
+        SpriteBundle {
+            texture,
+            transform: Transform {
+                translation: Vec3 {
+                    x: 140.,
+                    y: -260.,
+                    z: 1.,
+                },
+                ..default()
+            },
             ..default()
         },
-        ..default()
-    }, Boat, Direction::Left, Name::new("Boat")));
+        Boat,
+        Direction::Left,
+        Name::new("Boat"),
+    ));
 }
 
 fn spawn_button_move_boat(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((ButtonMoveBoat, Name::new("Button Move Boat"), ButtonBundle {
-        style: Style {
-            width: Val::Px(150.),
-            height: Val::Px(100.),
-            justify_content: JustifyContent::Center,
-            align_items: AlignItems::Center,
-            ..default()
-        },
-        background_color: Color::rgb_u8(255, 255, 255).into(),
-        ..default()
-    })).with_children(|parent| {
-            parent.spawn((Name::new("Text Button"), TextBundle::from_section("Move", TextStyle {
-                font: asset_server.load("fonts/HackNerdFont.ttf"),
-                font_size: 25.,
-                color: Color::BLACK,
+    commands
+        .spawn((
+            ButtonMoveBoat,
+            Name::new("Button Move Boat"),
+            ButtonBundle {
+                style: Style {
+                    width: Val::Px(150.),
+                    height: Val::Px(100.),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },
+                background_color: Color::rgb_u8(255, 255, 255).into(),
+                ..default()
             },
-            ).with_text_alignment(TextAlignment::Center)
-            .with_style(Style {
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                Name::new("Text Button"),
+                TextBundle::from_section(
+                    "Move",
+                    TextStyle {
+                        font: asset_server.load("fonts/HackNerdFont.ttf"),
+                        font_size: 25.,
+                        color: Color::BLACK,
+                    },
+                )
+                .with_text_alignment(TextAlignment::Center)
+                .with_style(Style {
                     position_type: PositionType::Relative,
                     ..default()
-            })));
+                }),
+            ));
         });
 }
 
@@ -75,10 +97,8 @@ fn check_button_boat(
     mut commands: Commands,
     interaction_query: Query<
         &Interaction,
-        (
-            Changed<Interaction>, With<ButtonMoveBoat>, Without<Boat>
-        )
-    >
+        (Changed<Interaction>, With<ButtonMoveBoat>, Without<Boat>),
+    >,
 ) {
     for interaction in &interaction_query {
         match *interaction {
@@ -90,10 +110,14 @@ fn check_button_boat(
     }
 }
 
-fn move_boat(mut commands: Commands, time: Res<Time>, mut boat_query: Query<(&mut Transform, &mut Direction), With<Boat>>) {
+fn move_boat(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut boat_query: Query<(&mut Transform, &mut Direction), With<Boat>>,
+) {
     let speed = 100.;
     let max_distance = 140.;
-    
+
     if let Ok((mut transform, mut direction)) = boat_query.get_single_mut() {
         match *direction {
             Direction::Left => transform.translation.x -= speed * time.delta_seconds(),

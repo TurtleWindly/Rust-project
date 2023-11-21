@@ -3,15 +3,15 @@ use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use chicken::ChickenPlugin;
 use boat::BoatPlugin;
+use chicken::ChickenPlugin;
 use land::LandPlugin;
 use main_menu::MainMenuPlugin;
 
 mod boat;
-mod main_menu;
-mod land;
 mod chicken;
+mod land;
+mod main_menu;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Default, States)]
 pub enum GameState {
