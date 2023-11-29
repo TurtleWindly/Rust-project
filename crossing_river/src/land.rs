@@ -1,13 +1,14 @@
-use crate::GameState;
+use crate::{GameState, Object};
 use bevy::prelude::*;
 
-pub struct LandPlugin;
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub struct LandSetupSet;
 
-impl Plugin for LandPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Game), (spawn_land, setup_slot));
-    }
-}
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub struct SpawnObjectSet;
+
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub struct AfterSpawnObjectSet;
 
 #[derive(Component)]
 enum SlotLocation {
@@ -20,8 +21,29 @@ struct Slot {
     empty: bool,
 }
 
+pub struct LandPlugin;
+
+impl Plugin for LandPlugin {
+    fn build(&self, app: &mut App) {
+        app
+        .configure_sets(
+            Update,
+            (LandSetupSet.before(SpawnObjectSet), SpawnObjectSet.before(AfterSpawnObjectSet)),
+        )
+        .add_systems(
+            OnEnter(GameState::Game),
+            (
+                spawn_land.before(setup_slot).in_set(LandSetupSet),
+                setup_slot.before(relocate_object_to_slot).in_set(LandSetupSet),
+                relocate_object_to_slot.in_set(AfterSpawnObjectSet),
+            ),
+        );
+    }
+}
+
 fn spawn_land(mut commands: Commands, asset_server: Res<AssetServer>) {
     let land = asset_server.load("land.png");
+    println!("1");
 
     commands.spawn((
         SpriteBundle {
@@ -67,6 +89,8 @@ fn setup_slot(mut commands: Commands) {
     let land_right = -150.;
     let slot_height = -250.;
 
+    println!("2");
+
     commands
         .spawn((
             SlotLocation::Left,
@@ -86,7 +110,7 @@ fn setup_slot(mut commands: Commands) {
         .with_children(|parent| {
             for slot in 1..=number_of_slot {
                 parent.spawn((
-                    Slot { empty: false },
+                    Slot { empty: true },
                     Name::new("Slot"),
                     SpriteBundle {
                         sprite: Sprite {
@@ -132,7 +156,7 @@ fn setup_slot(mut commands: Commands) {
         .with_children(|parent| {
             for slot in 1..=number_of_slot {
                 parent.spawn((
-                    Slot { empty: false },
+                    Slot { empty: true },
                     Name::new("Slot"),
                     SpriteBundle {
                         sprite: Sprite {
@@ -158,4 +182,26 @@ fn setup_slot(mut commands: Commands) {
                 ));
             }
         });
+}
+
+fn relocate_object_to_slot(
+    mut object_query: Query<(&mut Transform, &mut Object), With<Object>>,
+    mut slot_query: Query<(&Transform, &mut Slot), (With<Slot>, Without<Object>)>,
+) {
+    for (mut object_transform, mut object) in object_query.iter_mut() {
+        println!("{:?}", object_transform);
+        for (slot_transform, mut slot) in slot_query.iter_mut() {
+            if slot.empty {
+                println!("succes");
+                object_transform.translation = slot_transform.translation;
+                object.located = true;
+                slot.empty = false;
+                break;
+            }
+        }
+    }
+    println!("4");
+    for (mut transform, mut object) in object_query.iter_mut() {
+        println!("{}", object.located);
+    }
 }

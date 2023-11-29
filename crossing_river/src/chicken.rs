@@ -1,12 +1,13 @@
 use crate::boat::Direction;
 use crate::{GameState, Object, ObjectLocation};
 use bevy::prelude::*;
+use crate::land::SpawnObjectSet;
 
 pub struct ChickenPlugin;
 
 impl Plugin for ChickenPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Game), spawn_chicken);
+        app.add_systems(OnEnter(GameState::Game), spawn_chicken.in_set(SpawnObjectSet));
     }
 }
 
@@ -19,7 +20,7 @@ fn spawn_chicken(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn((
         Chicken,
-        Object,
+        Object::default(),
         ObjectLocation::Land,
         Direction::Left,
         Name::new("Chicken"),
