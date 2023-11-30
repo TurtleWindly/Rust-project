@@ -1,4 +1,6 @@
-use bevy::{prelude::*, ecs::query::QueryEntityError};
+use std::time::Duration;
+
+use bevy::prelude::*;
 
 // TODO: Add dino physic.
 pub struct DinoPlugin;
@@ -7,13 +9,26 @@ impl Plugin for DinoPlugin {
     fn build(&self, app: &mut App) {
         app.add_state::<DinoState>()
             .add_systems(Startup, dino_setup)
-            .add_systems(Update, dino_jump)
+            .add_systems(Update, handle_jump.run_if(in_state(DinoState::Jumping)))
+            .add_systems(Update, handle_fall.run_if(in_state(DinoState::Falling)))
+            .add_systems(Update, dino_jump.run_if(in_state(DinoState::Idle)))
             .add_systems(Update, animate_sprite);
     }
 }
 
 #[derive(Component)]
-struct Dino;
+pub struct Dino;
+
+#[derive(Component)]
+struct JumpTime {
+    timer: Timer,
+}
+
+#[derive(Component)]
+pub struct StartingPosition(Vec2);
+
+#[derive(Component)]
+pub struct FrameSize(pub f32, pub f32);
 
 #[derive(Component)]
 struct AnimationIndices {
@@ -49,6 +64,8 @@ pub enum DinoState {
     #[default]
     Idle,
     Running,
+    Jumping,
+    Falling,
 }
 
 fn dino_setup(
@@ -56,31 +73,74 @@ fn dino_setup(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    // TODO: Dino spreed sheet
     let texture_handle = asset_server.load("dino.png");
-    let frame = 96.;
-    let texture_atlas =
-        TextureAtlas::from_grid(texture_handle, Vec2::new(frame, frame), 2, 1, None, None);
+    let frame_size = (88., 92.);
+    let starting_pos = Vec2 { x: -480., y: -250. };
+    let texture_atlas = TextureAtlas::from_grid(
+        texture_handle,
+        Vec2::new(frame_size.0, frame_size.1),
+        2,
+        1,
+        None,
+        None,
+    );
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
     // Use only the subset of sprites in the sheet that make up the run animation
     let animation_indices = AnimationIndices { first: 0, last: 1 };
-    commands.spawn((Dino, Name::new("Dino"), SpriteSheetBundle {
-        texture_atlas: texture_atlas_handle,
-        sprite: TextureAtlasSprite::new(animation_indices.first),
-        transform: Transform {
-            translation: Vec3 { x: -480., y: -250., z:  2.},
+    commands.spawn((
+        Dino,
+        FrameSize(frame_size.0, frame_size.1),
+        Name::new("Dino"),
+        SpriteSheetBundle {
+            texture_atlas: texture_atlas_handle,
+            sprite: TextureAtlasSprite::new(animation_indices.first),
+            transform: Transform {
+                translation: Vec3 {
+                    x: starting_pos.x,
+                    y: starting_pos.y,
+                    z: 2.,
+                },
+                ..default()
+            },
             ..default()
         },
-        ..default()
-    },
-    animation_indices,
-    AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating))));
+        JumpTime {
+            timer: Timer::new(Duration::from_secs(1), TimerMode::Once),
+        },
+        StartingPosition(starting_pos),
+        animation_indices,
+        AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+    ));
 }
 
-fn dino_jump(keys: Res<Input<KeyCode>>, mut query: Query<&mut Transform, With<Dino>>) {
-    if keys.pressed(KeyCode::Space) {
-        let mut transform = query.single_mut();
+fn dino_jump(
+    keys: Res<Input<KeyCode>>,
+    mut commands: Commands,
+) {
+    if keys.just_pressed(KeyCode::Space) {
+        commands.insert_resource(NextState(Some(DinoState::Jumping)));
+    }
+}
 
-        transform.translation.y += 30.;
+fn handle_jump(mut commands: Commands, time: Res<Time>, mut query: Query<(&mut JumpTime, &mut Transform), With<Dino>>) {
+    if let Ok((mut jump, mut transform)) = query.get_single_mut() {
+        jump.timer.tick(time.delta());
+        if !jump.timer.finished() {
+            transform.translation.y += 80. * time.delta_seconds();
+        } else {
+            commands.insert_resource(NextState(Some(DinoState::Falling)));
+        }
+    }
+}
+
+//TODO: Here
+
+fn handle_fall(mut commands: Commands, time: Res<Time>, mut query: Query<(&StartingPosition, &mut Transform), With<Dino>>) {
+    if let Ok((starting_pos, mut transform)) = query.get_single_mut() {
+        if starting_pos.0 != transform.translation.truncate() {
+            transform.translation.y -= 80. * time.delta_seconds();
+        } else {
+            commands.insert_resource(NextState(Some(DinoState::Idle)));
+        }
     }
 }
