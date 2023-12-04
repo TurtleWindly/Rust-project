@@ -4,8 +4,10 @@ use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 mod dino;
+mod castus;
 
 use dino::DinoPlugin;
+use castus::CastusPlugin;
 
 fn main() {
     App::new()
@@ -20,7 +22,7 @@ fn main() {
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::Escape)),
         )
-        .add_plugins(DinoPlugin)
+        .add_plugins((DinoPlugin, CastusPlugin))
         .add_systems(Startup, camera_setup)
         .add_systems(Startup, background_setup)
         .run();
