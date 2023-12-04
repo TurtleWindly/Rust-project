@@ -1,17 +1,14 @@
 use std::time::Duration;
-
 use bevy::prelude::*;
 
-// TODO: Add dino physic.
 pub struct DinoPlugin;
 
 impl Plugin for DinoPlugin {
     fn build(&self, app: &mut App) {
         app.add_state::<DinoState>()
             .add_systems(Startup, dino_setup)
-            .add_systems(Update, handle_jump.run_if(in_state(DinoState::Jumping)))
-            .add_systems(Update, handle_fall.run_if(in_state(DinoState::Falling)))
             .add_systems(Update, dino_jump.run_if(in_state(DinoState::Idle)))
+            .add_systems(Update, handle_jump.run_if(in_state(DinoState::Jumping)))
             .add_systems(Update, animate_sprite);
     }
 }
@@ -105,7 +102,7 @@ fn dino_setup(
             ..default()
         },
         JumpTime {
-            timer: Timer::new(Duration::from_secs(1), TimerMode::Once),
+            timer: Timer::new(Duration::from_secs_f32(1.), TimerMode::Once),
         },
         StartingPosition(starting_pos),
         animation_indices,
@@ -113,34 +110,35 @@ fn dino_setup(
     ));
 }
 
-fn dino_jump(
-    keys: Res<Input<KeyCode>>,
-    mut commands: Commands,
-) {
+fn dino_jump(keys: Res<Input<KeyCode>>, mut commands: Commands) {
     if keys.just_pressed(KeyCode::Space) {
         commands.insert_resource(NextState(Some(DinoState::Jumping)));
     }
 }
 
-fn handle_jump(mut commands: Commands, time: Res<Time>, mut query: Query<(&mut JumpTime, &mut Transform), With<Dino>>) {
-    if let Ok((mut jump, mut transform)) = query.get_single_mut() {
+fn handle_jump(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(&mut JumpTime, &mut Transform, &StartingPosition), With<Dino>>,
+) {
+    let jump_speed = 700.;
+
+    if let Ok((mut jump, mut transform, starting_pos)) = query.get_single_mut() {
         jump.timer.tick(time.delta());
         if !jump.timer.finished() {
-            transform.translation.y += 80. * time.delta_seconds();
+            transform.translation.y = min(transform.translation.y + jump_speed
+                * time.delta_seconds()
+                * (jump.timer.remaining_secs() - jump.timer.elapsed_secs()), starting_pos.0.y);
         } else {
-            commands.insert_resource(NextState(Some(DinoState::Falling)));
+            jump.timer.reset();
+            commands.insert_resource(NextState(Some(DinoState::Idle)));
         }
     }
 }
 
-//TODO: Here
-
-fn handle_fall(mut commands: Commands, time: Res<Time>, mut query: Query<(&StartingPosition, &mut Transform), With<Dino>>) {
-    if let Ok((starting_pos, mut transform)) = query.get_single_mut() {
-        if starting_pos.0 != transform.translation.truncate() {
-            transform.translation.y -= 80. * time.delta_seconds();
-        } else {
-            commands.insert_resource(NextState(Some(DinoState::Idle)));
-        }
+fn min(value: f32, min: f32) -> f32 {
+    if value < min {
+        return min;
     }
+    value
 }
