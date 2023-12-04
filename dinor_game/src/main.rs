@@ -9,8 +9,18 @@ mod castus;
 use dino::DinoPlugin;
 use castus::CastusPlugin;
 
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Default, States)]
+pub enum GameState {
+    MainMenu,
+    // Temporary
+    #[default]
+    Game,
+    ScoreMenu,
+}
+
 fn main() {
     App::new()
+        .add_state::<GameState>()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "debug".into(),
