@@ -1,15 +1,20 @@
 use std::time::Duration;
 
-use crate::dino::FrameSize;
+use crate::dino::{Dino, FrameSize};
 use crate::GameState;
 use bevy::prelude::*;
+use bevy::sprite::collide_aabb::collide;
 
 pub struct CastusPlugin;
 
 impl Plugin for CastusPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Game), castus_spawner)
-            .add_systems(Update, (spawn_castus, castus_moving));
+        app.add_systems(Startup, castus_spawner)
+            .add_systems(
+                Update,
+                (spawn_castus, castus_moving, castus_collision).run_if(in_state(GameState::Game)),
+            )
+            .add_systems(OnExit(GameState::ScoreMenu), despawn_castus);
     }
 }
 
@@ -59,12 +64,12 @@ fn spawn_castus(
         spawner.timer.tick(time.delta());
         if spawner.timer.finished() {
             let texture = asset_server.load("castus.png");
-            let frame_size = (30., 74.);
+            let frame_size = Vec2::new(30., 74.);
             commands.entity(entity).with_children(|parent| {
                 parent.spawn((
                     Castus,
                     Name::new("Castus"),
-                    FrameSize(frame_size.0, frame_size.1),
+                    FrameSize { vector: frame_size },
                     SpriteBundle {
                         texture,
                         ..default()
@@ -82,5 +87,32 @@ fn castus_moving(mut commands: Commands, mut query: Query<(&mut Transform, Entit
         if castus.translation.x < -1350. {
             commands.entity(entity).despawn();
         }
+    }
+}
+
+fn castus_collision(
+    mut commands: Commands,
+    castus_query: Query<(&GlobalTransform, &FrameSize), With<Castus>>,
+    player: Query<(&Transform, &FrameSize), (With<Dino>, Without<Castus>)>,
+) {
+    if let Ok((player_transform, player_size)) = player.get_single() {
+        for (castus_transform, castus_size) in castus_query.iter() {
+            if collide(
+                player_transform.translation,
+                player_size.vector,
+                castus_transform.translation(),
+                castus_size.vector,
+            )
+            .is_some()
+            {
+                commands.insert_resource(NextState(Some(GameState::ScoreMenu)));
+            }
+        }
+    }
+}
+
+fn despawn_castus(mut commands: Commands, castus_query: Query<Entity, With<Castus>>) {
+    for entity in castus_query.iter() {
+        commands.entity(entity).despawn();
     }
 }
