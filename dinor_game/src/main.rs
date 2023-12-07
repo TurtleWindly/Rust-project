@@ -5,9 +5,11 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 mod dino;
 mod castus;
+mod score;
 
 use dino::DinoPlugin;
 use castus::CastusPlugin;
+use score::ScorePlugin;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Default, States)]
 pub enum GameState {
@@ -32,7 +34,7 @@ fn main() {
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::Escape)),
         )
-        .add_plugins((DinoPlugin, CastusPlugin))
+        .add_plugins((DinoPlugin, CastusPlugin, ScorePlugin))
         .add_systems(Startup, camera_setup)
         .add_systems(Startup, background_setup)
         .run();
