@@ -1,5 +1,7 @@
-use std::time::Duration;
 use bevy::prelude::*;
+use std::time::Duration;
+
+use crate::GameState;
 
 pub struct DinoPlugin;
 
@@ -8,8 +10,14 @@ impl Plugin for DinoPlugin {
         app.add_state::<DinoState>()
             .add_systems(Startup, dino_setup)
             .add_systems(Update, dino_jump.run_if(in_state(DinoState::Idle)))
-            .add_systems(Update, handle_jump.run_if(in_state(DinoState::Jumping)))
-            .add_systems(Update, animate_sprite);
+            .add_systems(
+                Update,
+                handle_jump
+                    .run_if(in_state(GameState::Game))
+                    .run_if(in_state(DinoState::Jumping)),
+            )
+            .add_systems(Update, animate_sprite)
+            .add_systems(OnExit(GameState::ScoreMenu), reset_dino);
     }
 }
 
@@ -25,7 +33,9 @@ struct JumpTime {
 pub struct StartingPosition(Vec2);
 
 #[derive(Component)]
-pub struct FrameSize(pub f32, pub f32);
+pub struct FrameSize {
+    pub vector: Vec2,
+}
 
 #[derive(Component)]
 struct AnimationIndices {
@@ -71,22 +81,15 @@ fn dino_setup(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     let texture_handle = asset_server.load("dino.png");
-    let frame_size = (88., 92.);
+    let frame_size = Vec2::new(88., 92.);
     let starting_pos = Vec2 { x: -480., y: -250. };
-    let texture_atlas = TextureAtlas::from_grid(
-        texture_handle,
-        Vec2::new(frame_size.0, frame_size.1),
-        2,
-        1,
-        None,
-        None,
-    );
+    let texture_atlas = TextureAtlas::from_grid(texture_handle, frame_size, 2, 1, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
     // Use only the subset of sprites in the sheet that make up the run animation
     let animation_indices = AnimationIndices { first: 0, last: 1 };
     commands.spawn((
         Dino,
-        FrameSize(frame_size.0, frame_size.1),
+        FrameSize { vector: frame_size },
         Name::new("Dino"),
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
@@ -95,7 +98,7 @@ fn dino_setup(
                 translation: Vec3 {
                     x: starting_pos.x,
                     y: starting_pos.y,
-                    z: 2.,
+                    z: 3.,
                 },
                 ..default()
             },
@@ -125,11 +128,16 @@ fn handle_jump(
 
     if let Ok((mut jump, mut transform, starting_pos)) = query.get_single_mut() {
         jump.timer.tick(time.delta());
-        if !jump.timer.finished() {
-            transform.translation.y = min(transform.translation.y + jump_speed
-                * time.delta_seconds()
-                * (jump.timer.remaining_secs() - jump.timer.elapsed_secs()), starting_pos.0.y);
-        } else {
+
+        transform.translation.y = min(
+            transform.translation.y
+                + jump_speed
+                    * time.delta_seconds()
+                    * (jump.timer.remaining_secs() - jump.timer.elapsed_secs()),
+            starting_pos.0.y,
+        );
+
+        if transform.translation.y == starting_pos.0.y {
             jump.timer.reset();
             commands.insert_resource(NextState(Some(DinoState::Idle)));
         }
@@ -141,4 +149,17 @@ fn min(value: f32, min: f32) -> f32 {
         return min;
     }
     value
+}
+
+fn reset_dino(
+    mut commands: Commands,
+    mut dino: Query<(&mut Transform, &StartingPosition), With<Dino>>,
+) {
+    // Reset Dino State
+    commands.insert_resource(NextState(Some(DinoState::Idle)));
+
+    // Reset Dino Position
+    if let Ok((mut transform, starting_pos)) = dino.get_single_mut() {
+        transform.translation = starting_pos.0.extend(2.);
+    }
 }
