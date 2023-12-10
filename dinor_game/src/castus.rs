@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::dino::{Dino, FrameSize};
+use crate::dino::{Dino, DinoState, FrameSize};
 use crate::GameState;
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
@@ -35,12 +35,8 @@ fn castus_spawner(mut commands: Commands) {
             timer: Timer::new(Duration::from_secs(2), TimerMode::Repeating),
         },
         Name::new("Castus Spawner"),
-        VisibilityBundle {
-            visibility: Visibility::Visible,
-            ..default()
-        },
-        TransformBundle {
-            local: Transform {
+        SpriteBundle {
+            transform: Transform {
                 translation: Vec3 {
                     x: spawn_pos.x,
                     y: spawn_pos.y,
@@ -96,16 +92,18 @@ fn castus_collision(
     player: Query<(&Transform, &FrameSize), (With<Dino>, Without<Castus>)>,
 ) {
     if let Ok((player_transform, player_size)) = player.get_single() {
+        let player_size_slimmer = Vec2::new(player_size.vector.x * 0.6, player_size.vector.y);
         for (castus_transform, castus_size) in castus_query.iter() {
             if collide(
                 player_transform.translation,
-                player_size.vector,
+                player_size_slimmer,
                 castus_transform.translation(),
                 castus_size.vector,
             )
             .is_some()
             {
                 commands.insert_resource(NextState(Some(GameState::ScoreMenu)));
+                commands.insert_resource(NextState(Some(DinoState::Collided)));
             }
         }
     }
