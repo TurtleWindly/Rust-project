@@ -9,7 +9,9 @@ impl Plugin for DinoPlugin {
     fn build(&self, app: &mut App) {
         app.add_state::<DinoState>()
             .add_systems(Startup, dino_setup)
-            .add_systems(Update, dino_jump.run_if(in_state(DinoState::Idle)))
+            .add_systems(OnEnter(GameState::Game), (to_running_state, running_dino_sprite))
+            .add_systems(OnEnter(DinoState::Collided), collided_dino_sprite)
+            .add_systems(Update, dino_jump.run_if(in_state(DinoState::Running)))
             .add_systems(
                 Update,
                 handle_jump
@@ -60,7 +62,11 @@ fn animate_sprite(
             sprite.index = if sprite.index == indices.last {
                 indices.first
             } else {
-                sprite.index + 1
+                if sprite.index > indices.last {
+                    indices.first
+                } else {
+                    sprite.index + 1
+                }
             };
         }
     }
@@ -70,6 +76,7 @@ fn animate_sprite(
 pub enum DinoState {
     #[default]
     Idle,
+    Collided,
     Running,
     Jumping,
     Falling,
@@ -83,7 +90,7 @@ fn dino_setup(
     let texture_handle = asset_server.load("dino.png");
     let frame_size = Vec2::new(88., 92.);
     let starting_pos = Vec2 { x: -480., y: -250. };
-    let texture_atlas = TextureAtlas::from_grid(texture_handle, frame_size, 2, 1, None, None);
+    let texture_atlas = TextureAtlas::from_grid(texture_handle, frame_size, 5, 1, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
     // Use only the subset of sprites in the sheet that make up the run animation
     let animation_indices = AnimationIndices { first: 0, last: 1 };
@@ -139,7 +146,7 @@ fn handle_jump(
 
         if transform.translation.y == starting_pos.0.y {
             jump.timer.reset();
-            commands.insert_resource(NextState(Some(DinoState::Idle)));
+            commands.insert_resource(NextState(Some(DinoState::Running)));
         }
     }
 }
@@ -155,11 +162,32 @@ fn reset_dino(
     mut commands: Commands,
     mut dino: Query<(&mut Transform, &StartingPosition), With<Dino>>,
 ) {
-    // Reset Dino State
-    commands.insert_resource(NextState(Some(DinoState::Idle)));
+    commands.insert_resource(NextState(Some(DinoState::Running)));
 
     // Reset Dino Position
     if let Ok((mut transform, starting_pos)) = dino.get_single_mut() {
         transform.translation = starting_pos.0.extend(2.);
+    }
+}
+
+fn to_running_state(mut commands: Commands) {
+    commands.insert_resource(NextState(Some(DinoState::Running)));
+}
+
+fn running_dino_sprite(mut query: Query<(&mut AnimationIndices, &mut AnimationTimer), With<Dino>>) {
+    if let Ok((mut animation_indices, mut timer)) = query.get_single_mut() {
+        timer.0 = Timer::new(Duration::from_millis(100), TimerMode::Repeating);
+        animation_indices.first = 2;
+        animation_indices.last = 3;
+    }
+}
+
+// Adding when dino collide with castus change sprite to dead dino
+fn collided_dino_sprite(mut query: Query<(&mut AnimationIndices, &mut TextureAtlasSprite), With<Dino>>) {
+    for (mut animation_indices, mut sprite) in query.iter_mut() {
+        animation_indices.first = 4;
+        animation_indices.last = 4;
+        // Dead Dino Sprite index
+        sprite.index = 4;
     }
 }
