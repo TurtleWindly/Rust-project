@@ -7,8 +7,10 @@ mod dino;
 mod castus;
 mod score;
 mod start_menu;
+mod background;
 
 use start_menu::StartMenuPlugin;
+use background::BackGroundPlugin;
 use dino::DinoPlugin;
 use castus::CastusPlugin;
 use score::ScorePlugin;
@@ -35,9 +37,8 @@ fn main() {
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::Escape)),
         )
-        .add_plugins((StartMenuPlugin, DinoPlugin, CastusPlugin, ScorePlugin))
+        .add_plugins((StartMenuPlugin, BackGroundPlugin, DinoPlugin, CastusPlugin, ScorePlugin))
         .add_systems(Startup, camera_setup)
-        .add_systems(Startup, background_setup)
         .run();
 }
 
@@ -55,19 +56,3 @@ fn camera_setup(mut commands: Commands) {
     });
 }
 
-fn background_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let texture = asset_server.load("background.png");
-
-    commands.spawn((Name::new("Background"), SpriteBundle {
-        texture,
-        transform: Transform {
-            translation: Vec3 {
-                x: 0.,
-                y: -250.,
-                z: 1.,
-            },
-            ..default()
-        },
-        ..default()
-    }));
-}
