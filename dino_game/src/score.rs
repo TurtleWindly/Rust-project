@@ -22,7 +22,8 @@ struct NodeScoreMenu;
 struct RestartButton;
 
 fn restart_button(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let texture = asset_server.load("restart_button.png");
+    let restart_button_img = asset_server.load("restart_button.png");
+    let game_over_img = asset_server.load("GameOver.png");
 
     commands
         .spawn((
@@ -30,6 +31,7 @@ fn restart_button(mut commands: Commands, asset_server: Res<AssetServer>) {
             Name::new("Score UI parent"),
             NodeBundle {
                 style: Style {
+                    flex_direction: FlexDirection::Column,
                     width: Val::Percent(100.),
                     height: Val::Percent(100.),
                     align_items: AlignItems::Center,
@@ -41,14 +43,25 @@ fn restart_button(mut commands: Commands, asset_server: Res<AssetServer>) {
         ))
         .with_children(|parent| {
             parent.spawn((
+               Name::new("Game Over Title"),
+               ImageBundle {
+                    image: UiImage {
+                      texture: game_over_img,
+                        ..default()  
+                    },
+                    ..default()
+                },
+            ));
+            parent.spawn((
                 RestartButton,
                 Name::new("Restart Button"),
                 ButtonBundle {
                     image: UiImage {
-                        texture,
+                        texture: restart_button_img,
                         ..default()
                     },
                     style: Style {
+                        margin: UiRect::all(Val::Px(50.)),
                         width: Val::Px(72.),
                         height: Val::Px(64.),
                         ..default()
