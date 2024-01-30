@@ -9,7 +9,9 @@ impl Plugin for ScorePlugin {
         app.add_systems(OnEnter(GameState::ScoreMenu), restart_button)
             .add_systems(
                 Update,
-                check_restart_button.run_if(in_state(GameState::ScoreMenu)),
+                (
+                    check_restart_button.run_if(in_state(GameState::ScoreMenu)),
+                ),
             )
             .add_systems(OnExit(GameState::ScoreMenu), despawn_menu);
     }
@@ -28,7 +30,7 @@ fn restart_button(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn((
             NodeScoreMenu,
-            Name::new("Score UI parent"),
+            Name::new("Restart UI parent"),
             NodeBundle {
                 style: Style {
                     flex_direction: FlexDirection::Column,
@@ -43,11 +45,11 @@ fn restart_button(mut commands: Commands, asset_server: Res<AssetServer>) {
         ))
         .with_children(|parent| {
             parent.spawn((
-               Name::new("Game Over Title"),
-               ImageBundle {
+                Name::new("Game Over Title"),
+                ImageBundle {
                     image: UiImage {
-                      texture: game_over_img,
-                        ..default()  
+                        texture: game_over_img,
+                        ..default()
                     },
                     ..default()
                 },
