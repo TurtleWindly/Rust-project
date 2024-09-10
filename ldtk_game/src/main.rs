@@ -1,11 +1,18 @@
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_light_2d::prelude::*;
 
 mod goal;
 mod player;
+mod shop;
+mod tourch;
 
 use goal::GoalPlugin;
 use player::PlayerPlugin;
+use shop::ShopPlugin;
+use tourch::TourchPlugin;
 
 fn main() {
     App::new()
@@ -21,9 +28,12 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
         )
-        .add_plugins(LdtkPlugin)
-        .add_plugins((PlayerPlugin, GoalPlugin))
+        .add_plugins(WorldInspectorPlugin::new())
+        .add_plugins((LdtkPlugin, Light2dPlugin))
+        .add_plugins(PhysicsPlugins::default())
+        .add_plugins((PlayerPlugin, GoalPlugin, ShopPlugin, TourchPlugin))
         .insert_resource(LevelSelection::index(0))
+        .insert_resource(Gravity(Vec2::new(0.0, 0.0)))
         .add_systems(Startup, setup)
         .run();
 }
