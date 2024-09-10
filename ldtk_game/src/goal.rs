@@ -36,7 +36,7 @@ fn check_goal(
     {
         let indices = match level_selection.into_inner() {
             LevelSelection::Indices(indices) => indices,
-            _ => panic!("Level go brrr"),
+            _ => panic!("No more Level"),
         };
         indices.level += 1;
     }
