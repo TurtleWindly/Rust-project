@@ -47,7 +47,7 @@ fn setup(mut commands: Commands, players: Query<Entity, Added<Player>>) {
     for player in &players {
         commands
             .entity(player)
-            .insert((RigidBody::Dynamic, Collider::rectangle(16.0, 32.0)));
+            .insert((RigidBody::Kinematic, Collider::rectangle(16.0, 32.0)));
     }
 }
 
