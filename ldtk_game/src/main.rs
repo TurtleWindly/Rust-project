@@ -4,11 +4,13 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_light_2d::prelude::*;
 
+mod collider;
 mod goal;
 mod player;
 mod shop;
 mod tourch;
 
+use collider::ColliderPlugin;
 use goal::GoalPlugin;
 use player::PlayerPlugin;
 use shop::ShopPlugin;
@@ -31,7 +33,13 @@ fn main() {
         .add_plugins(WorldInspectorPlugin::new())
         .add_plugins((LdtkPlugin, Light2dPlugin))
         .add_plugins(PhysicsPlugins::default())
-        .add_plugins((PlayerPlugin, GoalPlugin, ShopPlugin, TourchPlugin))
+        .add_plugins((
+            PlayerPlugin,
+            GoalPlugin,
+            ShopPlugin,
+            TourchPlugin,
+            ColliderPlugin,
+        ))
         .insert_resource(LevelSelection::index(0))
         .insert_resource(Gravity(Vec2::new(0.0, 0.0)))
         .add_systems(Startup, setup)
