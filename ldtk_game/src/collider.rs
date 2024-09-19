@@ -14,7 +14,7 @@ impl Plugin for ColliderPlugin {
 
 fn setup(mut commands: Commands, wall_qs: Query<(Entity, &TileEnumTags), Added<TileEnumTags>>) {
     for (entity, tile_enum) in &wall_qs {
-        print!("{}: {}", entity, tile_enum.tags[0]);
+        // print!("{}: {}", entity, tile_enum.tags[0]);
         commands
             .entity(entity)
             .insert((Collider::rectangle(GRID_SIZE, GRID_SIZE), RigidBody::Static));
