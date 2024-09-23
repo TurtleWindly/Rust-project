@@ -1,5 +1,6 @@
 use avian2d::math::*;
 use avian2d::prelude::*;
+use bevy::core_pipeline::bloom::BloomSettings;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
@@ -8,11 +9,13 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.register_ldtk_entity::<PlayerBundle>("Player")
+            .add_systems(Startup, setup_camera)
             .add_systems(
                 Update,
                 (
-                    setup,
+                    setup_player,
                     move_player_from_input,
+                    update_camera,
                     translate_grid_coords_entities,
                 )
                     .chain(),
@@ -21,6 +24,7 @@ impl Plugin for PlayerPlugin {
 }
 
 const GRID_SIZE: i32 = 16;
+const CAM_LERP_FACTOR: f32 = 2.0;
 
 #[derive(Default, Component)]
 pub struct Player;
@@ -51,7 +55,7 @@ struct PlayerBundle {
     movement_speed: MovementSpeed,
 }
 
-fn setup(mut commands: Commands, players: Query<Entity, Added<Player>>) {
+fn setup_player(mut commands: Commands, players: Query<Entity, Added<Player>>) {
     for player in &players {
         commands.entity(player).insert((
             RigidBody::Dynamic,
@@ -94,4 +98,33 @@ fn translate_grid_coords_entities(
             IVec2::splat(GRID_SIZE),
         );
     }
+}
+
+fn setup_camera(mut commands: Commands) {
+    let mut camera2d = Camera2dBundle::default();
+    camera2d.projection.scale = 0.3;
+    camera2d.camera.hdr = true;
+
+    commands.spawn((camera2d, BloomSettings::NATURAL));
+}
+
+fn update_camera(
+    mut camera: Query<&mut Transform, (With<Camera2d>, Without<Player>)>,
+    player: Query<&Transform, (With<Player>, Without<Camera2d>)>,
+    time: Res<Time>,
+) {
+    let Ok(mut camera) = camera.get_single_mut() else {
+        return;
+    };
+
+    let Ok(player) = player.get_single() else {
+        return;
+    };
+
+    let Vec3 { x, y, .. } = player.translation;
+    let direction = Vec3::new(x, y, camera.translation.z);
+
+    camera.translation = camera
+        .translation
+        .lerp(direction, time.delta_seconds() * CAM_LERP_FACTOR);
 }
