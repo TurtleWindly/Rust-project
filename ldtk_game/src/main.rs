@@ -48,12 +48,6 @@ fn main() {
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let mut camera = Camera2dBundle::default();
-    camera.projection.scale = 0.5;
-    camera.transform.translation.x += 1280.0 / 4.0;
-    camera.transform.translation.y += 720.0 / 4.0;
-    commands.spawn(camera);
-
     // Make object pickable
     commands.spawn((PickableBundle::default(), PbrBundle::default()));
 
