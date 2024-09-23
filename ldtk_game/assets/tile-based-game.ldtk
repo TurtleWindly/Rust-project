@@ -2251,6 +2251,20 @@
 							"defUid": 500,
 							"px": [176,64],
 							"fieldInstances": []
+						},
+						{
+							"__identifier": "Tourch",
+							"__grid": [12,9],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 487, "x": 128, "y": 160, "w": 16, "h": 16 },
+							"__smartColor": "#EAD4AA",
+							"iid": "e4de5050-73f0-11ef-ae69-617749f6394a",
+							"width": 16,
+							"height": 16,
+							"defUid": 500,
+							"px": [192,144],
+							"fieldInstances": []
 						}
 					]
 				},
@@ -2578,8 +2592,8 @@
 					"__opacity": 1,
 					"__pxTotalOffsetX": 0,
 					"__pxTotalOffsetY": 0,
-					"__tilesetDefUid": null,
-					"__tilesetRelPath": null,
+					"__tilesetDefUid": 488,
+					"__tilesetRelPath": "land_tiles/TilesetProps02.png",
 					"iid": "6bc193f0-4ce0-11ef-bbd1-d1136c1326aa",
 					"levelId": 492,
 					"layerDefUid": 496,
@@ -2590,7 +2604,7 @@
 					"intGridCsv": [],
 					"autoLayerTiles": [],
 					"seed": 2235280,
-					"overrideTilesetUid": null,
+					"overrideTilesetUid": 488,
 					"gridTiles": [],
 					"entityInstances": []
 				},
