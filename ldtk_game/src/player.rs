@@ -1,3 +1,4 @@
+use crate::inventory::InventoryBundle;
 use avian2d::math::*;
 use avian2d::prelude::*;
 use bevy::core_pipeline::bloom::BloomSettings;
@@ -86,6 +87,7 @@ fn setup_player(mut commands: Commands, players: Query<Entity, Added<Player>>) {
             RigidBody::Dynamic,
             Collider::rectangle(16.0, 32.0),
             LockedAxes::ROTATION_LOCKED,
+            InputManagerBundle::with_map(InventoryBundle::default_input_map()),
             InputManagerBundle::with_map(PlayerBundle::default_input_map()),
         ));
     }
@@ -103,6 +105,7 @@ fn move_player_from_input(
     >,
 ) {
     for (movement_speed, mut linear_velocity, action_state) in &mut players {
+        // println!("{:?}", action_state);
         let up = action_state.pressed(&PlayerAction::Up);
         let down = action_state.pressed(&PlayerAction::Down);
         let left = action_state.pressed(&PlayerAction::Left);

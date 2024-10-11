@@ -7,12 +7,14 @@ use bevy_mod_picking::prelude::*;
 
 mod collider;
 mod goal;
+mod inventory;
 mod player;
 mod shop;
 mod tourch;
 
 use collider::ColliderPlugin;
 use goal::GoalPlugin;
+use inventory::InventoryPlugin;
 use player::PlayerPlugin;
 use shop::ShopPlugin;
 use tourch::TourchPlugin;
@@ -36,6 +38,7 @@ fn main() {
         .add_plugins(PhysicsPlugins::default())
         .add_plugins((
             PlayerPlugin,
+            InventoryPlugin,
             GoalPlugin,
             ShopPlugin,
             TourchPlugin,
