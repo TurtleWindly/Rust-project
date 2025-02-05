@@ -1,4 +1,3 @@
-use crate::inventory::InventoryBundle;
 use avian2d::math::*;
 use avian2d::prelude::*;
 use bevy::core_pipeline::bloom::BloomSettings;
@@ -30,11 +29,13 @@ const GRID_SIZE: i32 = 16;
 const CAM_LERP_FACTOR: f32 = 2.0;
 
 #[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
-enum PlayerAction {
+pub enum PlayerAction {
     Up,
     Down,
     Left,
     Right,
+    OpenInventory,
+    SpawnTourch,
 }
 
 #[derive(Default, Component)]
@@ -76,6 +77,8 @@ impl PlayerBundle {
         input_map.insert(Down, KeyCode::KeyS);
         input_map.insert(Left, KeyCode::KeyA);
         input_map.insert(Right, KeyCode::KeyD);
+        input_map.insert(OpenInventory, KeyCode::KeyI);
+        input_map.insert(SpawnTourch, KeyCode::KeyO);
 
         input_map
     }
@@ -87,7 +90,6 @@ fn setup_player(mut commands: Commands, players: Query<Entity, Added<Player>>) {
             RigidBody::Dynamic,
             Collider::rectangle(16.0, 32.0),
             LockedAxes::ROTATION_LOCKED,
-            InputManagerBundle::with_map(InventoryBundle::default_input_map()),
             InputManagerBundle::with_map(PlayerBundle::default_input_map()),
         ));
     }

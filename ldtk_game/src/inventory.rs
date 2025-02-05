@@ -4,6 +4,8 @@ use bevy::window::PrimaryWindow;
 use bevy_ecs_ldtk::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+use crate::player::PlayerAction;
+
 pub struct InventoryPlugin;
 
 impl Plugin for InventoryPlugin {
@@ -12,36 +14,20 @@ impl Plugin for InventoryPlugin {
     }
 }
 
-#[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
-pub enum InventoryAction {
-    Interact,
-}
-
 #[derive(Default, Bundle)]
 pub struct InventoryBundle();
 
-impl InventoryBundle {
-    pub fn default_input_map() -> InputMap<InventoryAction> {
-        use InventoryAction::*;
-        let mut input_map = InputMap::default();
-
-        input_map.insert(Interact, MouseButton::Left);
-        input_map.insert(Interact, KeyCode::KeyU);
-
-        input_map
-    }
-}
-
 fn spawn_tourch(
-    inventory_action: Query<&ActionState<InventoryAction>, With<Player>>,
+    inventory_action: Query<&ActionState<PlayerAction>, With<Player>>,
     window: Query<&Window, (With<PrimaryWindow>, Without<Player>)>,
 ) {
     for action_state in &inventory_action {
-        // let bar = action_state.just_pressed(&InventoryAction::Interact);
-        // println!("{}", bar);
-        println!("{:?}", action_state);
-        if action_state.pressed(&InventoryAction::Interact) {
+        if action_state.pressed(&PlayerAction::SpawnTourch) {
             println!("pressed");
+            println!("aaa");
+            println!("bbbb");
+            println!("bbbb");
+            println!("bbbb");
         }
     }
 }
