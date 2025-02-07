@@ -5,6 +5,8 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+use crate::{CAM_LERP_FACTOR, GRID_SIZE};
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -24,9 +26,6 @@ impl Plugin for PlayerPlugin {
             );
     }
 }
-
-const GRID_SIZE: i32 = 16;
-const CAM_LERP_FACTOR: f32 = 2.0;
 
 #[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
 pub enum PlayerAction {

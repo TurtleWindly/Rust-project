@@ -19,6 +19,9 @@ use player::PlayerPlugin;
 use shop::ShopPlugin;
 use tourch::TourchPlugin;
 
+pub const GRID_SIZE: i32 = 16;
+pub const CAM_LERP_FACTOR: f32 = 2.0;
+
 fn main() {
     App::new()
         .add_plugins(

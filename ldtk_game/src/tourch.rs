@@ -6,13 +6,16 @@ use bevy_mod_picking::prelude::*;
 
 pub struct TourchPlugin;
 
-const DEFAULT_INTENSITY: f32 = 3.0;
+pub const DEFAULT_INTENSITY: f32 = 3.0;
 
 #[derive(Default, Component)]
-struct Tourch;
+pub struct Tourch;
 
 #[derive(Event)]
 struct TourchClicked(Entity);
+
+#[derive(Default, Component)]
+pub struct Lighter;
 
 impl From<ListenerInput<Pointer<Down>>> for TourchClicked {
     fn from(event: ListenerInput<Pointer<Down>>) -> Self {
@@ -29,12 +32,12 @@ impl Plugin for TourchPlugin {
 }
 
 #[derive(Default, Bundle, LdtkEntity)]
-struct TourchBundle {
-    tourch: Tourch,
+pub struct TourchBundle {
+    pub tourch: Tourch,
     #[sprite_sheet_bundle]
-    sprite_sheet_bundle: LdtkSpriteSheetBundle,
+    pub sprite_sheet_bundle: LdtkSpriteSheetBundle,
     #[grid_coords]
-    grid_coords: GridCoords,
+    pub grid_coords: GridCoords,
 }
 
 fn setup(mut commands: Commands, tourches: Query<Entity, Added<Tourch>>) {
